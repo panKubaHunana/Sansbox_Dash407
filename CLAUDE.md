@@ -5,7 +5,7 @@ Uživatel: Kuba (tykat, česky). Sandbox je PWA kopie launcheru Dash 407 (repo p
 ## Zpracování změn ze sandboxu (issues v tomto repu)
 1. Přečti otevřené issues „Sandbox: …“ – v těle je seznam změn a JSON (`pages` v mřížce `grid.cols × grid.rows`, `appearance`).
 2. Uprav Dash 407: výchozí rozložení v `home/Layout.kt` (`defaults()`, Domů je zapsané v mřížce 24 × 21 přes `f()`), případně jednorázovou migraci (jako `migrateHome` s novým příznakem), vzhled v `data/Appearance.kt`, widgety v `home/Widgets*.kt`. Zvyš `versionName` v `app/build.gradle.kts` a doplň `.github/release-notes.md`.
-3. Po vydání rádia aktualizuj tady: `radio-state.json` (radioVersion, capturedAt = nové datum → sandbox nabídne převzetí stavu rádia), totéž ve widgetech/JS, `version.json` (zvyš `version`, `radioVersion`, novinky), `APP_VERSION` v `js/core.js` a `CACHE` v `sw.js`.
+3. Po vydání rádia aktualizuj tady: `radio-state.json` (radioVersion, capturedAt = nové datum → sandbox nabídne převzetí stavu rádia), totéž ve widgetech/JS, `version.json` (`version` = stejná verze jako Dash 407, `radioVersion`, novinky; oprava jen v sandboxu = třetí číslo, např. 2.12.1), `APP_VERSION` v `js/core.js` a `CACHE` v `sw.js`.
 4. Issue zavři s odkazem na commit.
 
 ## Zásady

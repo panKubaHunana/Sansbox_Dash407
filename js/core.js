@@ -1,7 +1,7 @@
 'use strict';
 /* Sandbox Dash 407 – jádro: stav, vzhled, mřížka, rozložení ploch a data (kopie logiky z launcheru v rádiu). */
 
-const APP_VERSION = '1.0.1';
+const APP_VERSION = '2.12';
 const SANDBOX_REPO = 'panKubaHunana/Sansbox_Dash407';
 const RADIO_REPO = 'panKubaHunana/Dashboard_Peugeot_407';
 const SCREEN_W = 768, SCREEN_H = 1024, TOP_BAR = 174, BOTTOM_BAR = 170;

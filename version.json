@@ -1,9 +1,9 @@
 {
-  "version": "1.0.1",
+  "version": "2.12",
   "radioVersion": "2.12",
   "date": "2026-11-15",
   "notes": [
-    "Mřížka se v režimu úprav nepřepočítává (stejná oprava jako v rádiu 2.12) – widgety se po úpravách už neposouvají.",
-    "Sandbox odpovídá rádiu 2.12."
+    "Číslo verze sandboxu je teď stejné jako verze Dash 407 v rádiu (2.12).",
+    "Mřížka se v režimu úprav nepřepočítává (stejně jako v rádiu 2.12)."
   ]
 }
