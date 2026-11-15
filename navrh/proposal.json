@@ -1,10 +1,11 @@
 {
   "version": "2.13",
   "branch": "navrh-2.13",
-  "title": "Natočení mapy v navigaci",
-  "created": "2026-11-15T18:30:00+01:00",
+  "title": "Natočení mapy v navigaci a widget Rychlost",
+  "created": "2026-11-15T19:00:00+01:00",
   "notes": [
     "Navigace: mapa se už nesmyslně neotáčí",
-    "Navigace: nové tlačítko kompas – sever nahoře / mapa ve směru jízdy"
+    "Navigace: nové tlačítko kompas – sever nahoře / mapa ve směru jízdy",
+    "Rychlost: widget nově ukazuje okamžitou spotřebu a dojezd"
   ]
 }

@@ -45,10 +45,17 @@ function arcPath(cx, cy, r, a0, sweep) {
 const W_RENDER = {
   /* ---------- Jízda ---------- */
   SPEED(c, W, H) {
-    return card(W, H, { title: 'Rychlost' }, (cw, ch) => {
-      const lh = spN(14) * 1.2;
-      return fit(GPS.speed == null ? DASH : String(GPS.speed), 0, 0, cw, ch - lh, { weight: 700, maxSp: 160, wpc: 0.62 }) +
-        `<div style="position:absolute;bottom:0;width:100%;text-align:center;color:${P.Muted};font-size:${sp(14)}">km/h · GPS</div>`;
+    // Nahoře okamžitá spotřeba a dojezd (hodnoty v barvě zvýraznění), uprostřed velká rychlost, dole km/h · GPS.
+    return card(W, H, { pad: 10 }, (cw, ch) => {
+      const showCar = ch > 120 && cw > 150;
+      const lab = clamp(Math.min(cw / 18, ch / 12, 18), 12, 18), val = lab * 1.4;
+      const top = showCar ? (lab + val) * FS * 1.2 : 0;
+      const lh = 12 * FS * 1.2;
+      const rangeCol = (CAR.rangeKm == null ? 999 : CAR.rangeKm) < 80 ? P.Amber : LOOK.accent;
+      const rd = (l, v, col) => `<div class="col" style="flex:1;align-items:center;min-width:0"><div class="nowrap" style="color:${P.Text};font-size:${sp(lab)}">${esc(l)}</div><div class="nowrap" style="color:${col};font-size:${sp(val)}">${esc(v)}</div></div>`;
+      return (showCar ? `<div class="row" style="position:absolute;top:0;left:0;width:${cw}px">${rd('okamž. spotřeba', CAR.instantL100 != null ? decimal(CAR.instantL100) + ' l' : DASH + ' l', LOOK.accent)}${rd('dojezd', CAR.rangeKm != null ? CAR.rangeKm + ' km' : DASH + ' km', rangeCol)}</div>` : '') +
+        fit(GPS.speed == null ? DASH : String(GPS.speed), 0, top, cw, ch - top - lh, { weight: 700, maxSp: 160, wpc: 0.62 }) +
+        `<div style="position:absolute;bottom:0;width:100%;text-align:center;color:${P.Muted};font-size:${sp(12)}">km/h · GPS</div>`;
     });
   },
   SPEED_GAUGE(c, W, H) {

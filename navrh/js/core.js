@@ -127,7 +127,7 @@ const WT = {
   SPEED_LIMIT: ['Povolená rychlost', 'Omezení na silnici, kde jedeš (OpenStreetMap)', 'NAVIGATION', 1, 2, 1, 2],
   COMPASS: ['Kompas', 'Směr jízdy, nadmořská výška a rychlost z GPS', 'NAVIGATION', 2, 3, 1, 2],
   GPS: ['GPS', 'Satelity, přesnost, výška a stáří polohy', 'NAVIGATION', 2, 3, 2, 2],
-  SPEED: ['Rychlost', 'Velká digitální rychlost z GPS', 'DRIVING', 2, 3, 1, 2],
+  SPEED: ['Rychlost', 'Velká rychlost z GPS, nahoře okamžitá spotřeba a dojezd z auta', 'DRIVING', 2, 3, 1, 2],
   SPEED_GAUGE: ['Rychloměr a spotřeba', 'Obloukový rychloměr a pod ním okamžitá a průměrná spotřeba, ujeto a dojezd z auta', 'DRIVING', 2, 4, 2, 2],
   TRIP: ['Jízda', 'Ujetá vzdálenost, čas, průměr, maximum, odhad paliva a ceny', 'DRIVING', 2, 3, 2, 2],
   GFORCE: ['Přetížení', 'Boční a podélné přetížení v g se špičkami', 'DRIVING', 2, 3, 2, 2],
