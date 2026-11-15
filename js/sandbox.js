@@ -28,7 +28,8 @@ function fmtAp(k, v) {
   return String(v);
 }
 function cellText(c) { return `${wt.title(c.type)} (${c.type}) – sloupec ${c.x}, řádek ${c.y}, ${c.w} × ${c.h}${c.scale && c.scale !== 1 ? ', text ' + Math.round(c.scale * 100) + ' %' : ''}`; }
-function computeChanges() {
+/** Strukturované změny proti stavu rádia: každá má klíč, text a možnost vrátit ji v sandboxu. */
+function computeChangeItems() {
   const out = [];
   const b = S.baseline;
   if (!b) return out;
@@ -37,28 +38,60 @@ function computeChanges() {
     const bp = base.find(x => x.slot === p.slot);
     if (!bp) continue;
     const tag = `Plocha „${p.name}“ (${SLOTS[p.slot].where})`;
-    if (p.name !== bp.name) out.push(`${tag}: přejmenována z „${bp.name}“`);
-    if (p.enabled !== bp.enabled) out.push(`${tag}: ${p.enabled ? 'zapnuta' : 'vypnuta'}`);
+    const slot = p.slot;
+    if (p.name !== bp.name) out.push({ key: `page:${slot}:name`, text: `${tag}: přejmenována z „${bp.name}“`, revert: () => Layout.rename(slot, bp.name) });
+    if (p.enabled !== bp.enabled) out.push({ key: `page:${slot}:enabled`, text: `${tag}: ${p.enabled ? 'zapnuta' : 'vypnuta'}`, revert: () => Layout.setEnabled(slot, bp.enabled) });
     for (const c of p.cells) {
       const o = bp.cells.find(x => x.id === c.id);
-      if (!o) { out.push(`${tag}: přidán widget ${cellText(c)}`); continue; }
+      if (!o) {
+        out.push({ key: `cell:${slot}:${c.id}:add`, text: `${tag}: přidán widget ${cellText(c)}`, revert: () => Layout.setCells(slot, Layout.page(slot).cells.filter(x => x.id !== c.id)) });
+        continue;
+      }
       const ch = [];
       if (o.x !== c.x || o.y !== c.y) ch.push(`posun z ${o.x},${o.y} na ${c.x},${c.y}`);
       if (o.w !== c.w || o.h !== c.h) ch.push(`velikost z ${o.w} × ${o.h} na ${c.w} × ${c.h}`);
       if ((o.scale || 1) !== (c.scale || 1)) ch.push(`text z ${Math.round((o.scale || 1) * 100)} % na ${Math.round((c.scale || 1) * 100)} %`);
-      if (ch.length) out.push(`${tag}: ${wt.title(c.type)} – ${ch.join(', ')}`);
+      if (ch.length) out.push({
+        key: `cell:${slot}:${c.id}:edit`, text: `${tag}: ${wt.title(c.type)} – ${ch.join(', ')}`,
+        revert: () => {
+          const cells = Layout.page(slot).cells, back = Object.assign({}, c, { x: o.x, y: o.y, w: o.w, h: o.h, scale: o.scale || 1 });
+          if (!Layout.fits(cells, back)) return `${wt.title(c.type)} nejde vrátit – původní místo zabírá jiný widget. Nejdřív vrať ten.`;
+          Layout.setCells(slot, cells.map(x => x.id === c.id ? back : x));
+        }
+      });
     }
-    for (const o of bp.cells) if (!p.cells.find(x => x.id === o.id)) out.push(`${tag}: odebrán widget ${cellText(o)}`);
+    for (const o of bp.cells) if (!p.cells.find(x => x.id === o.id)) out.push({
+      key: `cell:${slot}:${o.id}:del`, text: `${tag}: odebrán widget ${cellText(o)}`,
+      revert: () => {
+        const cells = Layout.page(slot).cells;
+        if (!Layout.fits(cells, o)) return `${wt.title(o.type)} nejde vrátit – na jeho místě je teď jiný widget. Nejdřív ho posuň nebo vrať.`;
+        Layout.setCells(slot, cells.concat([Object.assign({}, o)]));
+      }
+    });
   }
   const ba = Object.assign({}, DEFAULT_APPEARANCE, b.appearance);
-  for (const k of Object.keys(APPEAR_LABELS)) if (JSON.stringify(ba[k]) !== JSON.stringify(S.appearance[k])) out.push(`Vzhled › ${APPEAR_LABELS[k]}: ${fmtAp(k, ba[k])} → ${fmtAp(k, S.appearance[k])}`);
+  for (const k of Object.keys(APPEAR_LABELS)) if (JSON.stringify(ba[k]) !== JSON.stringify(S.appearance[k])) out.push({ key: `ap:${k}`, text: `Vzhled › ${APPEAR_LABELS[k]}: ${fmtAp(k, ba[k])} → ${fmtAp(k, S.appearance[k])}`, revert: () => { S.appearance[k] = ba[k]; save(); } });
   return out;
 }
-function changePackage(note) {
-  const changes = computeChanges();
-  const pkg = { sandbox: APP_VERSION, radioVersion: S.baseline ? S.baseline.radioVersion : null, sent: new Date().toISOString(), grid: { cols: COLS, rows: S.rows, area: [SCREEN_W, areaBox().h] }, appearance: S.appearance, pages: S.pages.map(p => ({ slot: p.slot, name: p.name, enabled: p.enabled, cells: p.cells.map(c => ({ id: c.id, type: c.type, x: c.x, y: c.y, w: c.w, h: c.h, scale: c.scale || 1 })) })) };
-  const body = `## Změny ze sandboxu Dash 407\n\n${note ? '**Poznámka:** ' + note + '\n\n' : ''}**Seznam změn (proti rádiu ${pkg.radioVersion}):**\n${changes.length ? changes.map(c => '- ' + c).join('\n') : '- (rozložení a vzhled beze změny – jen poznámka)'}\n\nSandbox ${APP_VERSION} · mřížka ${COLS} × ${S.rows} · ${new Date().toLocaleString('cs')}\n\n<details><summary>Data pro Clauda (JSON)</summary>\n\n\`\`\`json\n${JSON.stringify(pkg)}\n\`\`\`\n</details>\n`;
-  return { changes, body, title: 'Sandbox: ' + (note ? note.slice(0, 60) : changes.length + ' změn rozložení/vzhledu') };
+function computeChanges() { return computeChangeItems().map(i => i.text); }
+
+/* Rozpracované odeslání: co je vyřazené, odebrané, upravené a vlastní řádky (uloží se v telefonu). */
+function draft() {
+  if (!S.sendDraft) S.sendDraft = { excluded: {}, removed: {}, edits: {}, custom: [], note: '' };
+  return S.sendDraft;
+}
+/** Položky, které se opravdu pošlou (zaškrtnuté, neodebrané, s upraveným textem) + vlastní řádky. */
+function sendLines() {
+  const d = draft();
+  const lines = computeChangeItems().filter(i => !d.removed[i.key] && !d.excluded[i.key]).map(i => (d.edits[i.key] || i.text).trim()).filter(Boolean);
+  return lines.concat(d.custom.map(t => t.trim()).filter(Boolean));
+}
+function changePackage() {
+  const d = draft(), note = (d.note || '').trim();
+  const lines = sendLines();
+  const pkg = { sandbox: APP_VERSION, radioVersion: S.baseline ? S.baseline.radioVersion : null, sent: new Date().toISOString(), grid: { cols: COLS, rows: S.rows, area: [SCREEN_W, areaBox().h] }, onlyListed: true, appearance: S.appearance, pages: S.pages.map(p => ({ slot: p.slot, name: p.name, enabled: p.enabled, cells: p.cells.map(c => ({ id: c.id, type: c.type, x: c.x, y: c.y, w: c.w, h: c.h, scale: c.scale || 1 })) })) };
+  const body = `## Změny ze sandboxu Dash 407\n\n${note ? '**Poznámka:** ' + note + '\n\n' : ''}**Proveď jen tyto změny (proti rádiu ${pkg.radioVersion}):**\n${lines.length ? lines.map(c => '- ' + c).join('\n') : '- (bez změn rozložení a vzhledu – jen poznámka)'}\n\nSandbox ${APP_VERSION} · mřížka ${COLS} × ${S.rows} · ${new Date().toLocaleString('cs')}\n\n<details><summary>Celý stav sandboxu pro Clauda (JSON – řiď se seznamem výše)</summary>\n\n\`\`\`json\n${JSON.stringify(pkg)}\n\`\`\`\n</details>\n`;
+  return { lines, body, title: 'Sandbox: ' + (note ? note.slice(0, 60) : lines.length + ' změn rozložení/vzhledu') };
 }
 
 /* ---------- Spodní / boční lišta sandboxu ---------- */
@@ -90,35 +123,96 @@ function sheet(html) {
 }
 function closeSheet() { const s = document.getElementById('sheet'); if (s) s.remove(); }
 
+/* ---------- Kontrola změn před odesláním ---------- */
 function openSend() {
-  const changes = computeChanges();
-  const d = sheet(`<h3>Odeslat změny Claudovi</h3>
-    <div class="muted">Změny proti stavu rádia ${S.baseline ? S.baseline.radioVersion : ''}. Claude je podle nich upraví v Dash 407, nahraje na GitHub a rádio i sandbox pak nabídnou aktualizaci.</div>
-    <div class="chg">${changes.length ? changes.map(c => '• ' + esc(c)).join('<br>') : 'Rozložení ani vzhled se nezměnily. Můžeš poslat jen poznámku (nápad, chybu…).'}</div>
-    <div class="muted" style="margin:10px 0 4px">Co chceš udělat / poznámka pro Clauda:</div>
-    <textarea id="sendNote" placeholder="Např. Na plochu Jízda chci rychloměr přes celou šířku…"></textarea>
-    <div class="acts">
-      <button class="sb hot" id="sGit"><span class="mi">bug_report</span>Vytvořit úkol na GitHubu</button>
-      <button class="sb" id="sShare"><span class="mi">ios_share</span>Sdílet (do Claude)</button>
-      <button class="sb" id="sCopy"><span class="mi">content_copy</span>Kopírovat</button>
-      <button class="sb" id="sClose"><span class="mi">close</span>Zavřít</button>
-    </div>
-    <div class="muted" style="margin-top:10px">Doporučeno: <b>Vytvořit úkol na GitHubu</b> → v Safari klepni na „Submit new issue“ (musíš být přihlášený). Pak Claudovi napiš „zpracuj změny ze sandboxu“. Nebo zvol Sdílet a vlož text rovnou do chatu s Claudem.</div>`);
-  const note = () => d.querySelector('#sendNote').value.trim();
-  d.querySelector('#sGit').onclick = () => {
-    const p = changePackage(note());
-    let url = `https://github.com/${SANDBOX_REPO}/issues/new?title=${encodeURIComponent(p.title)}&body=${encodeURIComponent(p.body)}`;
-    if (url.length > 7800) { copyText(p.body); url = `https://github.com/${SANDBOX_REPO}/issues/new?title=${encodeURIComponent(p.title)}&body=${encodeURIComponent('(Text změn je ve schránce – vlož ho sem.)')}`; alert('Změn je hodně, text se zkopíroval do schránky. Na GitHubu ho vlož do popisu úkolu.'); }
-    window.open(url, '_blank');
-  };
-  d.querySelector('#sShare').onclick = async () => {
-    const p = changePackage(note());
-    if (navigator.share) { try { await navigator.share({ title: p.title, text: p.body }); } catch (e) { } }
-    else { copyText(p.body); alert('Zkopírováno – vlož do chatu s Claudem.'); }
-  };
-  d.querySelector('#sCopy').onclick = () => { copyText(changePackage(note()).body); d.querySelector('#sCopy').innerHTML = '<span class="mi">check</span>Zkopírováno'; };
-  d.querySelector('#sClose').onclick = closeSheet;
+  const d = sheet('');
+  d.id = 'sheet';
+  renderSend();
+  d.addEventListener('click', onSendClick);
+  d.addEventListener('input', onSendInput);
 }
+function renderSend() {
+  const box = document.querySelector('#sheet .in');
+  if (!box) return;
+  const scroll = box.scrollTop;
+  const dr = draft(), items = computeChangeItems();
+  const shown = items.filter(i => !dr.removed[i.key]), removed = items.length - shown.length;
+  const nSend = sendLines().length;
+  let h = `<h3>Kontrola změn před odesláním</h3><div class="muted">Proti stavu rádia ${S.baseline ? esc(S.baseline.radioVersion) : ''}. Zaškrtnuté položky se pošlou Claudovi. Text můžeš přepsat, položku odebrat ze seznamu (v sandboxu zůstane) nebo ji rovnou vrátit zpět v sandboxu.</div>`;
+  if (!items.length) h += `<div class="chg">Proti rádiu nemáš žádnou změnu rozložení ani vzhledu.</div>`;
+  for (const i of shown) {
+    const ex = !!dr.excluded[i.key];
+    h += `<div class="ci${ex ? ' off' : ''}"><label class="ck"><input type="checkbox" data-k="${esc(i.key)}" ${ex ? '' : 'checked'}></label><textarea rows="2" data-edit="${esc(i.key)}">${esc(dr.edits[i.key] || i.text)}</textarea><div class="cbtn"><button class="ib" data-revert="${esc(i.key)}" title="Vrátit v sandboxu"><span class="mi">undo</span></button><button class="ib" data-remove="${esc(i.key)}" title="Odebrat ze seznamu"><span class="mi">delete</span></button></div></div>`;
+  }
+  dr.custom.forEach((t, n) => {
+    h += `<div class="ci"><label class="ck"><span class="mi" style="color:#4FC3F7">edit_note</span></label><textarea rows="2" data-custom="${n}" placeholder="Vlastní požadavek…">${esc(t)}</textarea><div class="cbtn"><button class="ib" data-delcustom="${n}" title="Smazat řádek"><span class="mi">delete</span></button></div></div>`;
+  });
+  h += `<div class="acts" style="margin-top:6px"><button class="sb" data-s="addline"><span class="mi">add</span>Přidat vlastní řádek</button>${removed ? `<button class="sb" data-s="restore"><span class="mi">restore</span>Vrátit odebrané (${removed})</button>` : ''}${Object.keys(dr.edits).length ? `<button class="sb" data-s="resettext"><span class="mi">format_clear</span>Původní texty</button>` : ''}</div>`;
+  h += `<div class="muted" style="margin:12px 0 4px">Poznámka pro Clauda:</div><textarea data-note="1" placeholder="Např. Na plochu Jízda chci rychloměr přes celou šířku…">${esc(dr.note || '')}</textarea>`;
+  h += `<details style="margin-top:10px"><summary class="muted">Náhled zprávy (${nSend} ${nSend === 1 ? 'položka' : nSend >= 2 && nSend <= 4 ? 'položky' : 'položek'})</summary><div class="chg" style="white-space:pre-wrap">${esc(sendPreview())}</div></details>`;
+  h += `<div class="acts"><button class="sb hot" data-s="git"><span class="mi">bug_report</span>Vytvořit úkol na GitHubu</button><button class="sb" data-s="share"><span class="mi">ios_share</span>Sdílet (do Claude)</button><button class="sb" data-s="copy"><span class="mi">content_copy</span>Kopírovat</button><button class="sb" data-s="close"><span class="mi">close</span>Zavřít</button></div>`;
+  h += `<div class="acts"><button class="sb danger" data-s="discard" ${items.length ? '' : 'disabled'}><span class="mi">delete_sweep</span>Zahodit všechny změny (vrátit stav rádia)</button></div>`;
+  h += `<div class="muted" style="margin-top:10px">Na GitHubu jen potvrď „Submit new issue“ a pak Claudovi napiš „zpracuj změny ze sandboxu“.</div>`;
+  box.innerHTML = h;
+  box.scrollTop = scroll;
+}
+function sendPreview() {
+  const d = draft(), lines = sendLines();
+  return (d.note ? 'Poznámka: ' + d.note.trim() + '\n\n' : '') + (lines.length ? lines.map(l => '• ' + l).join('\n') : '(nic k odeslání)');
+}
+function updatePreview() {
+  const sum = document.querySelector('#sheet details summary'), pv = document.querySelector('#sheet details .chg');
+  if (pv) pv.textContent = sendPreview();
+  if (sum) { const n = sendLines().length; sum.textContent = `Náhled zprávy (${n} ${n === 1 ? 'položka' : n >= 2 && n <= 4 ? 'položky' : 'položek'})`; }
+}
+function onSendInput(e) {
+  const t = e.target, d = draft();
+  if (t.dataset.k) { if (t.checked) delete d.excluded[t.dataset.k]; else d.excluded[t.dataset.k] = true; t.closest('.ci').classList.toggle('off', !t.checked); }
+  else if (t.dataset.edit) { const it = computeChangeItems().find(i => i.key === t.dataset.edit); if (it && t.value.trim() === it.text) delete d.edits[t.dataset.edit]; else d.edits[t.dataset.edit] = t.value; }
+  else if (t.dataset.custom != null) d.custom[+t.dataset.custom] = t.value;
+  else if (t.dataset.note) d.note = t.value;
+  else return;
+  save(); updatePreview();
+}
+function onSendClick(e) {
+  const b = e.target.closest('button');
+  if (!b) return;
+  const d = draft();
+  if (b.dataset.revert) {
+    const it = computeChangeItems().find(i => i.key === b.dataset.revert);
+    if (it) {
+      const err = it.revert();
+      if (err) { alert(err); return; }
+      delete d.edits[it.key]; delete d.excluded[it.key];
+      save(); wrapReset(); render();
+    }
+    renderSend(); return;
+  }
+  if (b.dataset.remove) { d.removed[b.dataset.remove] = true; save(); renderSend(); return; }
+  if (b.dataset.delcustom != null) { d.custom.splice(+b.dataset.delcustom, 1); save(); renderSend(); return; }
+  const s = b.dataset.s;
+  if (s === 'addline') { d.custom.push(''); save(); renderSend(); const tas = document.querySelectorAll('#sheet [data-custom]'); if (tas.length) tas[tas.length - 1].focus(); }
+  else if (s === 'restore') { d.removed = {}; save(); renderSend(); }
+  else if (s === 'resettext') { d.edits = {}; save(); renderSend(); }
+  else if (s === 'close') closeSheet();
+  else if (s === 'discard') {
+    if (!confirm('Zahodit všechny změny v sandboxu? Rozložení a vzhled se vrátí přesně podle rádia a seznam změn se vymaže.')) return;
+    applyBaseline(S.baseline, true); S.sendDraft = null; U.editing = false; U.selected = null; U.undo = []; save(); wrapReset(); render(); renderSend();
+  }
+  else if (s === 'git' || s === 'share' || s === 'copy') {
+    const p = changePackage();
+    if (!p.lines.length && !(d.note || '').trim()) { alert('Není co odeslat – zaškrtni aspoň jednu změnu nebo napiš poznámku.'); return; }
+    if (s === 'git') {
+      let url = `https://github.com/${SANDBOX_REPO}/issues/new?title=${encodeURIComponent(p.title)}&body=${encodeURIComponent(p.body)}`;
+      if (url.length > 7800) { copyText(p.body); url = `https://github.com/${SANDBOX_REPO}/issues/new?title=${encodeURIComponent(p.title)}&body=${encodeURIComponent('(Text změn je ve schránce – vlož ho sem.)')}`; alert('Změn je hodně, text se zkopíroval do schránky. Na GitHubu ho vlož do popisu úkolu.'); }
+      window.open(url, '_blank');
+    } else if (s === 'share') {
+      if (navigator.share) navigator.share({ title: p.title, text: p.body }).catch(() => { });
+      else { copyText(p.body); alert('Zkopírováno – vlož do chatu s Claudem.'); }
+    } else { copyText(p.body); b.innerHTML = '<span class="mi">check</span>Zkopírováno'; }
+  }
+}
+function wrapReset() { const w = document.querySelector('#area .pagewrap'); if (w) w._last = null; }
 function copyText(t) {
   if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(t).catch(() => fallbackCopy(t));
   else fallbackCopy(t);
@@ -134,7 +228,7 @@ const Upd = {
     try {
       const r = await fetch('version.json?t=' + Date.now(), { cache: 'no-store' });
       this.remote = await r.json();
-      this.available = cmpVer(this.remote.version, APP_VERSION) > 0;
+      this.available = cmpVer(this.remote.version, APP_VERSION) > 0 || (cmpVer(this.remote.version, APP_VERSION) === 0 && (this.remote.build || 0) > APP_BUILD);
     } catch (e) { if (manual) toast('Aktualizaci se nepodařilo zjistit – chybí internet?'); }
     try {
       const j = await (await fetch(`https://api.github.com/repos/${RADIO_REPO}/releases/latest`, { cache: 'no-store' })).json();
@@ -155,7 +249,8 @@ const Upd = {
   offer() {
     const n = this.remote;
     const notes = (n.notes || []).map(x => `<div style="display:flex;gap:6px"><span>•</span><span>${esc(x)}</span></div>`).join('');
-    dialog(`Nová verze ${esc(n.version)}`, `<div style="font-size:16px;color:${P.Text}">Máš verzi ${APP_VERSION}. Na GitHubu je novější – stáhnout a rovnou nainstalovat?</div><div style="margin-top:6px">Odpovídá rádiu ${esc(n.radioVersion)}.</div><div style="margin-top:10px">${notes}</div>`, [['Později', 'updlater'], ['Stáhnout a nainstalovat', 'updinstall', true]]);
+    const same = n.version === APP_VERSION;
+    dialog(same ? `Aktualizace sandboxu ${esc(n.version)}` : `Nová verze ${esc(n.version)}`, `<div style="font-size:16px;color:${P.Text}">${same ? 'Sandbox má na GitHubu vylepšení (verze zůstává stejná jako v rádiu). Stáhnout a rovnou nainstalovat?' : `Máš verzi ${APP_VERSION}. Na GitHubu je novější – stáhnout a rovnou nainstalovat?`}</div><div style="margin-top:6px">Odpovídá rádiu ${esc(n.radioVersion)}.</div><div style="margin-top:10px">${notes}</div>`, [['Později', 'updlater'], ['Stáhnout a nainstalovat', 'updinstall', true]]);
   },
   info() {
     const base = S.baseline ? S.baseline.radioVersion : '?';
@@ -236,7 +331,7 @@ async function init() {
   setupInput();
   document.getElementById('sbx').addEventListener('click', e => { const b = e.target.closest('[data-sb]'); if (b) onSandboxButton(b.dataset.sb); });
   window.sandboxAct2 = window.sandboxAct;
-  window.sandboxAct = (a, b, c) => { if (a === 'fullreset') { applyBaseline(S.baseline, true); U.slot = 'CENTER'; U.editing = false; closeDialog(); toast('Sandbox odpovídá rádiu ' + S.baseline.radioVersion); return; } window.sandboxAct2(a, b, c); };
+  window.sandboxAct = (a, b, c) => { if (a === 'fullreset') { applyBaseline(S.baseline, true); S.sendDraft = null; save(); wrapReset(); U.slot = 'CENTER'; U.editing = false; closeDialog(); toast('Sandbox odpovídá rádiu ' + S.baseline.radioVersion); return; } window.sandboxAct2(a, b, c); };
   window.addEventListener('resize', layoutStage);
   window.addEventListener('orientationchange', () => setTimeout(layoutStage, 300));
   startGps();

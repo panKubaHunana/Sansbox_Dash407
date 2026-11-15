@@ -3,7 +3,9 @@
   "radioVersion": "2.12",
   "date": "2026-11-15",
   "notes": [
-    "Číslo verze sandboxu je teď stejné jako verze Dash 407 v rádiu (2.12).",
-    "Mřížka se v režimu úprav nepřepočítává (stejně jako v rádiu 2.12)."
-  ]
+    "Kontrola změn před odesláním: u každé změny zaškrtni, jestli se má poslat, přepiš text, odeber ji ze seznamu nebo ji vrať v sandboxu.",
+    "Vlastní řádky s požadavky, náhled zprávy a tlačítko „Zahodit všechny změny“.",
+    "Rozpracovaný seznam se pamatuje i po zavření."
+  ],
+  "build": 2
 }
