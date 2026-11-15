@@ -8,7 +8,7 @@ Tady si zkoušíš rozložení a vzhled; změny pošleš Claudovi, ten je uděl�
 | Oblast | V sandboxu |
 |---|---|
 | Obrazovka | 768 × 1024 px (1 dp = 1 px), horní lišta jednotky 174 px, spodní lišta klimatizace 170 px, plocha 768 × 680 |
-| Mřížka | 24 sloupců × řádky podle tvaru plochy (21; v režimu úprav 18 – stejně jako v rádiu) |
+| Mřížka | 24 sloupců × řádky podle tvaru plochy (21, i v režimu úprav – od verze 2.12 se nepřepočítává) |
 | Plochy | kříž Domů / Mapa / Jízda / Auto / Hudba + Menu, přechod tahem prstu, kříž s názvem plochy |
 | Úpravy | přidat, posunout, roztáhnout, zkopírovat, smazat, velikost textu, krok zpět, mřížka, přejmenování, zapnutí ploch |
 | Widgety | všech 22 typů (rychlá volba, rychloměr, jízda, stav vozu, přehrávač, počasí, mapa, navigace, kompas, GPS, limit, přetížení, časomíra, napětí, spotřeba, servis, klima, hodiny, dok…) |

@@ -200,7 +200,8 @@ function onSandboxButton(id) {
 function checkRows() {
   const ab = areaBox(), g = LOOK.gap / 2;
   const w = SCREEN_W - 2 * g, h = ab.pageH - 2 * g;
-  if (U.slot === 'MENU' || h < SCREEN_H * 0.5) return;
+  // 2.12: v režimu úprav se mřížka nepřepočítává (jako v rádiu).
+  if (U.editing || U.slot === 'MENU' || h < SCREEN_H * 0.5) return;
   const rows = clamp(Math.round(COLS * h / w), 12, 48);
   if (rows !== S.rows) { Layout.setRows(rows); render(); }
 }
