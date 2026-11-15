@@ -3,9 +3,10 @@
   "radioVersion": "2.12",
   "date": "2026-11-15",
   "notes": [
-    "Kontrola změn před odesláním: u každé změny zaškrtni, jestli se má poslat, přepiš text, odeber ji ze seznamu nebo ji vrať v sandboxu.",
-    "Vlastní řádky s požadavky, náhled zprávy a tlačítko „Zahodit všechny změny“.",
-    "Rozpracovaný seznam se pamatuje i po zavření."
+    "Náhled oprav pro rádio (zatím neschválené, v rádiu ještě nejsou):",
+    "Přehrávač: tlačítka předchozí – přehrát – další se zmenší podle šířky widgetu, takže se vejdou vždy (dřív „další“ přetékalo).",
+    "Rychlá volba: ikona Kontaktů má pevnou modrou barvu, aby byla vidět v každém vzhledu.",
+    "V rádiu navíc: tmavší přechod a stín pod názvem skladby, aby šel číst i přes obal alba (sandbox obaly alb nemá)."
   ],
-  "build": 2
+  "build": 3
 }

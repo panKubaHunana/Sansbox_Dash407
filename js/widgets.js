@@ -247,7 +247,9 @@ const W_RENDER = {
   },
   MEDIA(c, W, H) {
     const m = mediaState();
-    const big = clamp(Math.min((H - 24) * 0.36, 76), 40, 76), small = big * 0.86;
+    // Tlačítka se musí vejít vedle sebe: velké + 2 × malé (0,86) + 2 mezery 8 px v šířce bez okrajů (2 × 22 px).
+    const inner = W - 44;
+    const big = clamp(Math.min((H - 24) * 0.36, 76, (inner - 16) / 2.72), 32, 76), small = big * 0.86;
     const titleSp = clamp(Math.min((H - 24) * 0.13, 32), 16, 32);
     const bg = `linear-gradient(135deg,#3D8FC4,#7466A6,#B8735E,#1A1414)`;
     return `<div class="card clickable" data-act="media:open" style="left:0;top:0;width:${W}px;height:${H}px;border-radius:${LOOK.corner}px;background:${bg}">` +
@@ -285,7 +287,7 @@ const W_RENDER = {
           h += name(k ? k.name : 'Přidat', k ? P.Text : P.Muted);
           h += `<div class="rbtn clickable" data-act="dial:${i}" data-long="dialedit:${i}" style="width:${ic}px;height:${ic}px;background:${k ? '#10E01A' : tA(0.08)}">${k ? `<span style="color:#fff;font-size:${ic * 0.38 * FS}px;font-weight:700">${esc(initials(k.name))}</span>` : icon('add', ic * 0.45, P.Muted)}</div>`;
         } else {
-          h += name('Kontakty', P.Text) + `<div class="rbtn clickable" data-act="contacts" style="width:${ic}px;height:${ic}px;background:#F1F3F6">${icon('contacts', ic * 0.5, LOOK.accent)}</div>`;
+          h += name('Kontakty', P.Text) + `<div class="rbtn clickable" data-act="contacts" style="width:${ic}px;height:${ic}px;background:#F1F3F6">${icon('contacts', ic * 0.5, '#1E88E5')}</div>`;
         }
         return h + `</div>`;
       };
