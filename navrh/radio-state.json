@@ -1,6 +1,6 @@
 {
   "radioVersion": "2.13",
-  "capturedAt": "2026-11-15T19:15:00+01:00",
+  "capturedAt": "2026-11-15T19:30:00+01:00",
   "source": "Fotky obrazovky rádia z 15. 11. 2026 (IMG_2805, IMG_2806); ostatní plochy podle výchozího rozložení 2.11, plocha Jízda je v rádiu prázdná.",
   "screen": {
     "width": 768,
@@ -265,17 +265,7 @@
       "slot": "DOWN",
       "name": "Jízda",
       "enabled": true,
-      "cells": [
-        {
-          "id": "wspeed213",
-          "type": "SPEED",
-          "x": 0,
-          "y": 0,
-          "w": 10,
-          "h": 7,
-          "scale": 1
-        }
-      ]
+      "cells": []
     }
   ],
   "quickDialNote": "Skutečná jména kontaktů z rádia sem nedáváme (repozitář je veřejný). Zadej si je v sandboxu podržením kolečka – uloží se jen v telefonu."
