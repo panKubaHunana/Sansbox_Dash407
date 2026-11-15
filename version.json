@@ -3,10 +3,9 @@
   "radioVersion": "2.12",
   "date": "2026-11-15",
   "notes": [
-    "Náhled oprav pro rádio (zatím neschválené, v rádiu ještě nejsou):",
-    "Přehrávač: tlačítka předchozí – přehrát – další se zmenší podle šířky widgetu, takže se vejdou vždy (dřív „další“ přetékalo).",
-    "Rychlá volba: ikona Kontaktů má pevnou modrou barvu, aby byla vidět v každém vzhledu.",
-    "V rádiu navíc: tmavší přechod a stín pod názvem skladby, aby šel číst i přes obal alba (sandbox obaly alb nemá)."
+    "Návrhy ke schválení: Claude pošle úpravy rádia nejdřív do sandboxu. Prohlédneš si je v náhledu a jedním tlačítkem „Schválit a nahrát“ je pošleš do rádia.",
+    "U návrhu můžeš poslat připomínky – do rádia se pak nic nenahraje.",
+    "Stav rádia a náhled návrhu jsou oddělené, tvoje rozložení se nepřepíše."
   ],
-  "build": 3
+  "build": 4
 }

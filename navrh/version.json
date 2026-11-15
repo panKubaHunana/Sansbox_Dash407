@@ -1,0 +1,11 @@
+{
+  "version": "2.13",
+  "radioVersion": "2.13",
+  "date": "2026-11-15",
+  "notes": [
+    "Přehrávač: tlačítka předchozí – přehrát – další se zmenší podle šířky widgetu, vejdou se i do úzkého přehrávače.",
+    "Přehrávač: tmavší přechod přes obal alba a stín pod názvem skladby (čitelné i přes světlý obrázek).",
+    "Rychlá volba: ikona Kontaktů má pevnou modrou barvu (nemění se s barvou zvýraznění)."
+  ],
+  "build": 1
+}

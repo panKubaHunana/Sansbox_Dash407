@@ -99,16 +99,25 @@ function renderSandboxBar() {
   const bar = document.getElementById('sbx');
   const n = computeChanges().length;
   const modes = { snapshot: 'Snímek z rádia', demo: 'Ukázková jízda', off: 'Bez auta' };
-  const key = [n, S.prefs.dataMode, S.prefs.showBars, Upd.available ? Upd.remote.version : '', Upd.radioNewer, U.editing].join('|');
+  const pv = Prop.data ? Prop.data.version : '';
+  const key = [n, S.prefs.dataMode, S.prefs.showBars, Upd.available ? Upd.remote.version + Upd.remote.build : '', Upd.radioNewer, U.editing, pv, Prop.released, Upd.radioLatest].join('|');
   if (bar.dataset.key === key) return;
   bar.dataset.key = key;
-  bar.innerHTML =
-    `<button class="sb${n ? ' hot' : ''}" data-sb="send"><span class="mi">send</span>Odeslat změny${n ? ` <span class="badge">${n}</span>` : ''}</button>` +
-    `<button class="sb${Upd.available || Upd.radioNewer ? ' hot' : ''}" data-sb="update"><span class="mi">system_update</span>Aktualizace${Upd.available || Upd.radioNewer ? ' <span class="badge">!</span>' : ''}</button>` +
-    `<button class="sb" data-sb="mode"><span class="mi">directions_car</span>${modes[S.prefs.dataMode]}</button>` +
-    `<button class="sb" data-sb="bars"><span class="mi">${S.prefs.showBars ? 'web_asset' : 'crop_free'}</span>Lišty ${S.prefs.showBars ? 'zapnuté' : 'skryté'}</button>` +
-    `<button class="sb" data-sb="reset"><span class="mi">restart_alt</span>Stav rádia</button>` +
-    `<div class="sbinfo">Sandbox ${APP_VERSION} · rádio ${S.baseline ? S.baseline.radioVersion : '?'}${Upd.radioLatest ? ' (GitHub ' + Upd.radioLatest + ')' : ''}</div>`;
+  let h = '';
+  if (IS_PROPOSAL) {
+    h += `<div class="propbar"><span class="mi">science</span>NÁHLED NÁVRHU ${esc(pv || APP_VERSION)}${Prop.released ? ' – už vydáno' : ' – v rádiu zatím není'}</div>`;
+    if (!Prop.released) h += `<button class="sb ok" data-sb="approve"><span class="mi">check_circle</span>Schválit a nahrát</button><button class="sb" data-sb="comment"><span class="mi">rate_review</span>Připomínky</button>`;
+    h += `<button class="sb" data-sb="propinfo"><span class="mi">info</span>Co je v návrhu</button><button class="sb" data-sb="toradio"><span class="mi">arrow_back</span>Stav rádia</button>`;
+  } else {
+    if (Prop.pending) h += `<button class="sb ok" data-sb="propinfo"><span class="mi">science</span>Návrh ${esc(pv)} ke schválení <span class="badge" style="background:#3DDC84;color:#06121C">!</span></button>`;
+    h += `<button class="sb${n ? ' hot' : ''}" data-sb="send"><span class="mi">send</span>Odeslat změny${n ? ` <span class="badge">${n}</span>` : ''}</button>` +
+      `<button class="sb${Upd.available || Upd.radioNewer ? ' hot' : ''}" data-sb="update"><span class="mi">system_update</span>Aktualizace${Upd.available || Upd.radioNewer ? ' <span class="badge">!</span>' : ''}</button>`;
+  }
+  h += `<button class="sb" data-sb="mode"><span class="mi">directions_car</span>${modes[S.prefs.dataMode]}</button>` +
+    `<button class="sb" data-sb="bars"><span class="mi">${S.prefs.showBars ? 'web_asset' : 'crop_free'}</span>Lišty ${S.prefs.showBars ? 'zapnuté' : 'skryté'}</button>`;
+  if (!IS_PROPOSAL) h += `<button class="sb" data-sb="reset"><span class="mi">restart_alt</span>Stav rádia</button>`;
+  h += `<div class="sbinfo">${IS_PROPOSAL ? 'Návrh ' + esc(pv || APP_VERSION) + ' · rádio ' + esc(Upd.radioLatest || '?') : 'Sandbox ' + APP_VERSION + ' · rádio ' + (S.baseline ? S.baseline.radioVersion : '?') + (Upd.radioLatest ? ' (GitHub ' + Upd.radioLatest + ')' : '')}</div>`;
+  bar.innerHTML = h;
   layoutStage();
 }
 
@@ -243,7 +252,7 @@ const Upd = {
     this.checking = false;
     renderSandboxBar();
     if (U.panel === 'SETTINGS') refreshPanel();
-    if (this.available) this.offer();
+    if (this.available && !IS_PROPOSAL) this.offer();
     else if (manual) this.info();
   },
   offer() {
@@ -273,18 +282,77 @@ const Upd = {
 function cmpVer(a, b) { const x = String(a).split('.').map(Number), y = String(b).split('.').map(Number); for (let i = 0; i < Math.max(x.length, y.length); i++) { const d = (x[i] || 0) - (y[i] || 0); if (d) return d > 0 ? 1 : -1; } return 0; }
 function majorMinor(v) { return String(v).split('.').slice(0, 2).join('.'); }
 
+
+/* ---------- Návrhy od Clauda ke schválení (složka navrh/) ---------- */
+const Prop = {
+  data: null,
+  get pending() { return !!this.data && !this.released; },
+  get released() { return !!(this.data && Upd.radioLatest && cmpVer(majorMinor(Upd.radioLatest), majorMinor(this.data.version)) >= 0); },
+  async load() {
+    try {
+      const r = await fetch((IS_PROPOSAL ? 'proposal.json' : 'navrh/proposal.json') + '?t=' + Date.now(), { cache: 'no-store' });
+      this.data = r.ok ? await r.json() : null;
+    } catch (e) { /* bez internetu */ }
+    renderSandboxBar();
+    return this.data;
+  },
+  notesHtml() { return (this.data.notes || []).map(n => `<div style="display:flex;gap:8px;margin:4px 0"><span>•</span><span>${esc(n)}</span></div>`).join(''); },
+  open() {
+    const p = this.data;
+    if (!p) return;
+    const when = p.created ? new Date(p.created).toLocaleString('cs') : '';
+    const d = sheet(`<h3>Návrh ${esc(p.version)}${p.title ? ' – ' + esc(p.title) : ''}</h3>
+      <div class="muted">Připravil Claude ${esc(when)}. ${this.released ? '<b style="color:#3DDC84">Už je schválený a vydaný.</b>' : 'Čeká na tvoje schválení – v rádiu zatím nic není.'}</div>
+      <div class="chg">${this.notesHtml() || 'Bez popisu.'}</div>
+      <div class="acts">
+        ${IS_PROPOSAL ? '<button class="sb" id="pBack"><span class="mi">arrow_back</span>Zpět na stav rádia</button>' : '<button class="sb hot" id="pView"><span class="mi">visibility</span>Zobrazit náhled</button>'}
+        ${this.released ? '' : '<button class="sb ok" id="pOk"><span class="mi">check_circle</span>Schválit a nahrát</button><button class="sb" id="pNote"><span class="mi">rate_review</span>Připomínky</button>'}
+        <button class="sb" id="pClose"><span class="mi">close</span>Zavřít</button>
+      </div>
+      <div class="muted" style="margin-top:10px">Po schválení se návrh na GitHubu sám sloučí, sestaví se APK ${esc(p.version)} a rádio ho nabídne při příštím spuštění. Sandbox se na novou verzi přepne do 30 minut.</div>`);
+    const q = s => d.querySelector(s);
+    if (q('#pView')) q('#pView').onclick = () => { location.href = 'navrh/'; };
+    if (q('#pBack')) q('#pBack').onclick = () => { location.href = '../'; };
+    if (q('#pOk')) q('#pOk').onclick = () => this.approve();
+    if (q('#pNote')) q('#pNote').onclick = () => this.comment();
+    q('#pClose').onclick = closeSheet;
+  },
+  approve() {
+    const p = this.data;
+    if (!confirm(`Schválit návrh ${p.version} a nahrát ho do rádia?\n\nNa GitHubu se otevře předvyplněný úkol – stačí klepnout na „Create“ (Submit new issue).`)) return;
+    const body = `Schvaluji návrh **${p.version}**${p.title ? ' – ' + p.title : ''} po kontrole v sandboxu.\n\n${(p.notes || []).map(n => '- ' + n).join('\n')}\n\nZkontrolováno: ${new Date().toLocaleString('cs')} (sandbox ${APP_VERSION}, sestavení ${APP_BUILD}).\n\n_Tento úkol automaticky sloučí větev \`${p.branch}\` do main a spustí sestavení APK._`;
+    window.open(`https://github.com/${RADIO_REPO}/issues/new?title=${encodeURIComponent('Schválit návrh ' + p.version)}&body=${encodeURIComponent(body)}`, '_blank');
+    const d = sheet(`<h3>Skoro hotovo</h3><div>Na GitHubu klepni na <b>Create</b> (Submit new issue). Pak už se všechno udělá samo:</div><div class="chg">1. návrh se sloučí do rádia (asi 30 s)<br>2. GitHub sestaví APK ${esc(p.version)} (asi 5 min)<br>3. rádio při spuštění nabídne aktualizaci<br>4. sandbox se přepne na ${esc(p.version)} (do 30 min)</div><div class="muted">Stav uvidíš v úkolu na GitHubu – objeví se tam komentář ✅ a úkol se zavře.</div><div class="acts"><button class="sb" id="pDone"><span class="mi">check</span>Rozumím</button></div>`);
+    d.querySelector('#pDone').onclick = closeSheet;
+  },
+  comment() {
+    const p = this.data;
+    const d = sheet(`<h3>Připomínky k návrhu ${esc(p.version)}</h3><div class="muted">Co je potřeba změnit? Claude návrh upraví a pošle znovu ke schválení. Do rádia se nic nenahraje.</div><textarea id="pText" placeholder="Např. Tlačítka jsou moc malá, Kontakty chci zelené…"></textarea><div class="acts"><button class="sb hot" id="pGit"><span class="mi">bug_report</span>Poslat jako úkol na GitHub</button><button class="sb" id="pShare"><span class="mi">ios_share</span>Sdílet (do Claude)</button><button class="sb" id="pClose2"><span class="mi">close</span>Zrušit</button></div>`);
+    const text = () => d.querySelector('#pText').value.trim();
+    const body = () => `## Připomínky k návrhu ${p.version}\n\n${text() || '(bez textu)'}\n\nNávrh:\n${(p.notes || []).map(n => '- ' + n).join('\n')}\n\nVětev: \`${p.branch}\` – zatím neschvalovat.`;
+    d.querySelector('#pGit').onclick = () => window.open(`https://github.com/${SANDBOX_REPO}/issues/new?title=${encodeURIComponent('Připomínky k návrhu ' + p.version)}&body=${encodeURIComponent(body())}`, '_blank');
+    d.querySelector('#pShare').onclick = () => { if (navigator.share) navigator.share({ title: 'Připomínky k návrhu ' + p.version, text: body() }).catch(() => { }); else { copyText(body()); alert('Zkopírováno – vlož do chatu s Claudem.'); } };
+    d.querySelector('#pClose2').onclick = closeSheet;
+  }
+};
+
 window.sandboxAct = (a, b) => {
   if (a === 'syncreq') {
     closeDialog();
     const body = `## Srovnat sandbox s rádiem\n\nRádio má na GitHubu vydání **${Upd.radioLatest}**, sandbox ${APP_VERSION} kopíruje rádio ${S.baseline ? S.baseline.radioVersion : '?'}.\nProsím přenes změny z Dash 407 do sandboxu (vzhled, widgety, radio-state.json) a vydej novou verzi sandboxu.`;
     window.open(`https://github.com/${SANDBOX_REPO}/issues/new?title=${encodeURIComponent('Srovnat sandbox s rádiem ' + Upd.radioLatest)}&body=${encodeURIComponent(body)}`, '_blank');
   }
+  if (a === 'propview') { location.href = 'navrh/'; return; }
   if (a === 'basenew') { applyBaseline(S.pendingBaseline, true); S.baseline = S.pendingBaseline; closeDialog(); toast('Sandbox teď odpovídá rádiu ' + S.baseline.radioVersion); }
   if (a === 'basekeep') { S.baseAt = S.pendingBaseline.capturedAt; save(); closeDialog(); }
 };
 
 function onSandboxButton(id) {
-  if (id === 'send') openSend();
+  if (id === 'approve') { if (Prop.data) Prop.approve(); else toast('Návrh se ještě načítá'); }
+  else if (id === 'comment') { if (Prop.data) Prop.comment(); }
+  else if (id === 'propinfo') Prop.open();
+  else if (id === 'toradio') location.href = '../';
+  else if (id === 'send') openSend();
   else if (id === 'update') Upd.check(true);
   else if (id === 'mode') { const order = ['snapshot', 'demo', 'off']; S.prefs.dataMode = order[(order.indexOf(S.prefs.dataMode) + 1) % 3]; demoT = 0; save(); carTick(); render(); toast({ snapshot: 'Data: snímek z rádia 15. 11.', demo: 'Data: ukázková jízda', off: 'Data: bez auta' }[S.prefs.dataMode]); }
   else if (id === 'bars') { S.prefs.showBars = !S.prefs.showBars; save(); render(); }
@@ -321,10 +389,14 @@ async function init() {
   let baseline = null;
   try { baseline = await (await fetch('radio-state.json', { cache: 'no-cache' })).json(); } catch (e) { }
   const had = load();
+  if (IS_PROPOSAL && !had) {
+    // Náhled návrhu: osobní data (kontakty, tankování, jízdy, nastavení) převezme ze sandboxu, rozložení z návrhu.
+    try { const r = JSON.parse(localStorage.getItem('sbx407_v1') || '{}'); for (const k of ['quickDial', 'favorites', 'prefs', 'fuel', 'service', 'drives', 'trip', 'odometer', 'warningLabels']) if (r[k] != null) S[k] = r[k]; } catch (e) { }
+  }
   if (baseline) {
     S.baseline = baseline;
-    if (!had) applyBaseline(baseline, false);
-    else if (S.baseAt && S.baseAt !== baseline.capturedAt) S.pendingBaseline = baseline;
+    if (!had) applyBaseline(baseline, IS_PROPOSAL);
+    else if (S.baseAt && S.baseAt !== baseline.capturedAt) { if (IS_PROPOSAL) applyBaseline(baseline, true); else S.pendingBaseline = baseline; }
   }
   if (!S.pages.length && baseline) applyBaseline(baseline, false);
   computeLook();
@@ -349,7 +421,15 @@ async function init() {
       dialog('Co je nového ve verzi ' + esc(v.version), (v.notes || []).map(x => '• ' + esc(x)).join('<br>'), [['Rozumím', 'dlgclose', true]]);
     } catch (e) { }
   }
-  setTimeout(() => Upd.check(false), 2500);
+  setTimeout(async () => {
+    await Upd.check(false);
+    await Prop.load();
+    // Kořen: nový návrh od Clauda se jednou ohlásí oknem.
+    if (!IS_PROPOSAL && Prop.pending && S.seenProposal !== Prop.data.created && !U.dialog) {
+      S.seenProposal = Prop.data.created; save();
+      dialog(`Návrh ${esc(Prop.data.version)} ke schválení`, `Claude připravil úpravy rádia. V rádiu zatím nic není – nejdřív si je prohlédni.<div style="margin-top:8px">${Prop.notesHtml()}</div>`, [['Později', 'dlgclose'], ['Zobrazit náhled', 'propview', true]]);
+    }
+  }, 2500);
   setInterval(() => Upd.check(false), 30 * 60 * 1000);
   document.addEventListener('visibilitychange', () => { if (!document.hidden) Upd.check(false); });
   // Takt 1 s jako v rádiu: data, jízda, překreslení.
@@ -359,6 +439,6 @@ async function init() {
     if (Date.now() - Weather.at > 15 * 60 * 1000) refreshWeather(false);
     if (!drag && !anim && !press && !document.hidden) render();
   }, 1000);
-  if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(() => { });
+  if ('serviceWorker' in navigator) navigator.serviceWorker.register(IS_PROPOSAL ? '../sw.js' : 'sw.js', { scope: IS_PROPOSAL ? '../' : './' }).catch(() => { });
 }
 document.addEventListener('DOMContentLoaded', init);

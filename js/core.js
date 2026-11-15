@@ -2,13 +2,15 @@
 /* Sandbox Dash 407 – jádro: stav, vzhled, mřížka, rozložení ploch a data (kopie logiky z launcheru v rádiu). */
 
 const APP_VERSION = '2.12'; // vždy stejná jako verze Dash 407 v rádiu
-const APP_BUILD = 3; // skryté číslo sestavení sandboxu – opravy jen v sandboxu, verze se nemění
+const APP_BUILD = 4; // skryté číslo sestavení sandboxu – opravy jen v sandboxu, verze se nemění
 const SANDBOX_REPO = 'panKubaHunana/Sansbox_Dash407';
 const RADIO_REPO = 'panKubaHunana/Dashboard_Peugeot_407';
 const SCREEN_W = 768, SCREEN_H = 1024, TOP_BAR = 174, BOTTOM_BAR = 170;
 const DASH = '–';
 const HK_LAT = 50.2092, HK_LON = 15.8328;
-const STORE_KEY = 'sbx407_v1';
+/** Náhled návrhu (složka navrh/) má vlastní uložený stav, aby nepřepsal stav rádia. */
+const IS_PROPOSAL = /\/navrh\//.test(location.pathname);
+const STORE_KEY = IS_PROPOSAL ? 'sbx407_navrh_v1' : 'sbx407_v1';
 
 /* ---------------- Formátování (česky) ---------------- */
 const pad2 = n => String(n).padStart(2, '0');
@@ -190,7 +192,7 @@ const U = { panel: null, editing: false, slot: 'CENTER', selected: null, showGri
 function save() {
   try {
     const o = {};
-    for (const k of ['pages', 'rows', 'appearance', 'quickDial', 'favorites', 'prefs', 'fuel', 'service', 'drives', 'trip', 'odometer', 'warningLabels', 'baseAt', 'seenVersion', 'dismissedRadio', 'sendDraft']) o[k] = S[k];
+    for (const k of ['pages', 'rows', 'appearance', 'quickDial', 'favorites', 'prefs', 'fuel', 'service', 'drives', 'trip', 'odometer', 'warningLabels', 'baseAt', 'seenVersion', 'dismissedRadio', 'sendDraft', 'seenProposal']) o[k] = S[k];
     localStorage.setItem(STORE_KEY, JSON.stringify(o));
   } catch (e) { /* neuloženo */ }
 }

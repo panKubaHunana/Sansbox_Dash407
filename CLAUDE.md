@@ -8,6 +8,14 @@ Uživatel: Kuba (tykat, česky). Sandbox je PWA kopie launcheru Dash 407 (repo p
 3. Po vydání rádia aktualizuj tady: `radio-state.json` (radioVersion, capturedAt = nové datum → sandbox nabídne převzetí stavu rádia), totéž ve widgetech/JS, `version.json` (`version` = vždy stejná verze jako Dash 407 – Kuba si nepřeje jiné číslo; `build` = skryté číslo sestavení, při změně jen v sandboxu zvyš `build` i `APP_BUILD` v `js/core.js`, verzi neměň; při nové verzi rádia `build` = 1), `APP_VERSION` v `js/core.js` a `CACHE` v `sw.js` (např. sbx407-2.12-b2).
 4. Issue zavři s odkazem na commit.
 
+## Úpravy rádia – vždy nejdřív návrh ke schválení (Kubovo přání)
+Kuba přes týden nemůže zkoušet v rádiu, proto **nikdy nenahrávej změny rádia rovnou do main**.
+1. V Dashboard_Peugeot_407 vytvoř větev `navrh-<verze>` (např. navrh-2.13), zvyš `versionName` a doplň `.github/release-notes.md`. Push jen té větve (main se nesestavuje). Neměň `.github/workflows` ve větvi návrhu.
+2. Tady spusť `tools/novy-navrh.sh <verze> "<krátký název>"` → vznikne `navrh/` (kopie sandboxu). Stejné úpravy udělej v `navrh/js/…`, doplň `notes` v `navrh/proposal.json` a `navrh/version.json`. Kořen sandboxu (= stav rádia) neměň. Push do main.
+3. Sandbox Kubovi ohlásí „Návrh X ke schválení“. V náhledu klepne na **Schválit a nahrát** → úkol „Schválit návrh X“ v Dashboard_Peugeot_407 → workflow `approve.yml` sloučí větev do main a spustí build.yml → rádio nabídne aktualizaci. Workflow `promote.yml` tady pak (do 30 min) přesune `navrh/` do kořene.
+4. Připomínky přijdou jako úkol „Připomínky k návrhu X“ v tomto repu → uprav větev i `navrh/` a pošli znovu (aktualizuj `created` v proposal.json).
+5. Commity do main rádia mimo schválení (jen workflow) označ `[skip ci]`, aby nevznikla nová verze.
+
 ## Zásady
 - Rozměry 1:1 s rádiem: 768 × 1024, lišty 174/170 px, 1 dp = 1 px. Velikosti písma a výpočty kopírují Kotlin kód.
 - Repozitář je veřejný: žádná jména a čísla kontaktů, žádné API klíče.

@@ -29,6 +29,12 @@ Tlačítko **Odeslat změny** pod obrazovkou ukáže seznam změn proti rádiu. 
 - **Vytvořit úkol na GitHubu** – otevře předvyplněný úkol (issue) v tomto repozitáři, stačí *Submit new issue*;
 - nebo **Sdílet** / **Kopírovat** a vložit do chatu s Claudem.
 
+## Návrhy ke schválení
+
+Úpravy rádia od Clauda přijdou nejdřív jako **návrh** (složka `navrh/`, v sandboxu zelené tlačítko *Návrh X ke schválení*).
+V náhledu je žlutý pruh *NÁHLED NÁVRHU*. Klepnutím na **Schválit a nahrát** se otevře předvyplněný úkol v Dashboard_Peugeot_407 –
+po jeho založení se návrh sám sloučí, sestaví se APK a rádio nabídne aktualizaci. **Připomínky** pošlou návrh zpět Claudovi.
+
 ## Aktualizace
 
 Stejně jako rádio: při spuštění (a každých 30 min) se sandbox podívá na `version.json`. Když je novější verze, nabídne

@@ -1,0 +1,11 @@
+{
+  "version": "2.13",
+  "branch": "navrh-2.13",
+  "title": "Přehrávač a ikona Kontaktů",
+  "created": "2026-11-15T17:41:50+01:00",
+  "notes": [
+    "Přehrávač: tlačítka předchozí – přehrát – další se zmenší podle šířky widgetu, vejdou se i do úzkého přehrávače.",
+    "Přehrávač: tmavší přechod přes obal alba a stín pod názvem skladby (čitelné i přes světlý obrázek).",
+    "Rychlá volba: ikona Kontaktů má pevnou modrou barvu (nemění se s barvou zvýraznění)."
+  ]
+}

@@ -139,3 +139,8 @@ table.tb th { font-size: 13px; font-weight: 500; }
 .sheet .sb.danger .mi { color: #FF5252; }
 .sheet .sb[disabled] { opacity: .4; }
 .sheet details summary { cursor: pointer; margin-top: 4px; }
+
+.sb.ok { border-color: #3DDC84; }
+.sb.ok .mi { color: #3DDC84; }
+.propbar { width: 100%; text-align: center; background: #3a2a00; color: #FFD54F; border: 1px solid #FFB300; border-radius: 12px; padding: 8px 10px; font-weight: 700; letter-spacing: .5px; display: flex; align-items: center; justify-content: center; gap: 6px; }
+.propbar .mi { color: #FFD54F; font-size: 20px; }
