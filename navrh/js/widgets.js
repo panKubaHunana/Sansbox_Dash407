@@ -45,17 +45,25 @@ function arcPath(cx, cy, r, a0, sweep) {
 const W_RENDER = {
   /* ---------- Jízda ---------- */
   SPEED(c, W, H) {
-    // Nahoře okamžitá spotřeba a dojezd (hodnoty v barvě zvýraznění), uprostřed velká rychlost, dole km/h · GPS.
+    // Navigace (dřív Rychlost): v rozích spotřeba, dojezd, příjezd do cíle a zbývající km, uprostřed velká rychlost.
     return card(W, H, { pad: 10 }, (cw, ch) => {
-      const showCar = ch > 120 && cw > 150;
-      const lab = clamp(Math.min(cw / 18, ch / 12, 18), 12, 18), val = lab * 1.4;
-      const top = showCar ? (lab + val) * FS * 1.2 : 0;
-      const lh = 12 * FS * 1.2;
+      const showRows = ch > 150 && cw > 150;
+      const lab = clamp(Math.min(cw / 17, ch / 11.5, 18), 12, 18), val = lab * 1.4;
+      const rowH = showRows ? (lab + val) * FS * 1.2 : 0;
       const rangeCol = (CAR.rangeKm == null ? 999 : CAR.rangeKm) < 80 ? P.Amber : LOOK.accent;
+      const nav = (typeof NAVSIM !== 'undefined' && NAVSIM.active) ? NAVSIM : null;
+      const arrival = nav ? new Date(Date.now() + nav.remainingS * 1000).toLocaleTimeString('cs', { hour: 'numeric', minute: '2-digit' }) : DASH;
+      const left = nav ? (nav.remainingM < 10000 ? decimal(nav.remainingM / 1000) : String(Math.round(nav.remainingM / 1000))) : DASH;
       const rd = (l, v, col) => `<div class="col" style="flex:1;align-items:center;min-width:0"><div class="nowrap" style="color:${P.Text};font-size:${sp(lab)}">${esc(l)}</div><div class="nowrap" style="color:${col};font-size:${sp(val)}">${esc(v)}</div></div>`;
-      return (showCar ? `<div class="row" style="position:absolute;top:0;left:0;width:${cw}px">${rd('okamž. spotřeba', CAR.instantL100 != null ? decimal(CAR.instantL100) + ' l' : DASH + ' l', LOOK.accent)}${rd('dojezd', CAR.rangeKm != null ? CAR.rangeKm + ' km' : DASH + ' km', rangeCol)}</div>` : '') +
-        fit(GPS.speed == null ? DASH : String(GPS.speed), 0, top, cw, ch - top - lh, { weight: 700, maxSp: 160, wpc: 0.62 }) +
-        `<div style="position:absolute;bottom:0;width:100%;text-align:center;color:${P.Muted};font-size:${sp(12)}">km/h · GPS</div>`;
+      const row = (y, a, b2) => `<div class="row" style="position:absolute;${y};left:0;width:${cw}px">${a}${b2}</div>`;
+      if (!showRows) {
+        const lh = 12 * FS * 1.2;
+        return fit(GPS.speed == null ? DASH : String(GPS.speed), 0, 0, cw, ch - lh, { weight: 700, maxSp: 160, wpc: 0.62 }) +
+          `<div style="position:absolute;bottom:0;width:100%;text-align:center;color:${P.Muted};font-size:${sp(12)}">km/h</div>`;
+      }
+      return row('top:0', rd('okamž. spotřeba', CAR.instantL100 != null ? decimal(CAR.instantL100) + ' l' : DASH + ' l', LOOK.accent), rd('dojezd km', CAR.rangeKm != null ? String(CAR.rangeKm) : DASH, rangeCol)) +
+        fit(GPS.speed == null ? DASH : String(GPS.speed), 0, rowH, cw, ch - 2 * rowH, { weight: 700, maxSp: 160, wpc: 0.62 }) +
+        row('bottom:0', rd('příjezd do cíle', arrival, LOOK.accent), rd('zbývá km', left, LOOK.accent));
     });
   },
   SPEED_GAUGE(c, W, H) {
