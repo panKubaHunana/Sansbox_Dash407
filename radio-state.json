@@ -1,6 +1,6 @@
 {
   "radioVersion": "2.13",
-  "capturedAt": "2026-11-15T19:30:00+01:00",
+  "capturedAt": "2026-11-15T19:50:00+01:00",
   "source": "Fotky obrazovky rádia z 15. 11. 2026 (IMG_2805, IMG_2806); ostatní plochy podle výchozího rozložení 2.11, plocha Jízda je v rádiu prázdná.",
   "screen": {
     "width": 768,
@@ -59,7 +59,7 @@
       "enabled": true,
       "cells": [
         {
-          "id": "h1",
+          "id": "c0",
           "type": "PHONE_DIAL",
           "x": 0,
           "y": 0,
@@ -68,7 +68,7 @@
           "scale": 1
         },
         {
-          "id": "h2",
+          "id": "c1",
           "type": "SPEED_GAUGE",
           "x": 3,
           "y": 0,
@@ -77,7 +77,7 @@
           "scale": 1
         },
         {
-          "id": "h3",
+          "id": "c2",
           "type": "TRIP_COMPUTER",
           "x": 13,
           "y": 0,
@@ -86,7 +86,7 @@
           "scale": 1
         },
         {
-          "id": "h4",
+          "id": "c3",
           "type": "DOORS",
           "x": 3,
           "y": 12,
@@ -95,7 +95,7 @@
           "scale": 1
         },
         {
-          "id": "h5",
+          "id": "c4",
           "type": "MEDIA",
           "x": 16,
           "y": 12,
@@ -111,39 +111,30 @@
       "enabled": true,
       "cells": [
         {
-          "id": "u1",
+          "id": "u0",
           "type": "MAP",
           "x": 0,
           "y": 0,
           "w": 24,
-          "h": 18,
+          "h": 14,
+          "scale": 1
+        },
+        {
+          "id": "u1",
+          "type": "SPEED",
+          "x": 0,
+          "y": 14,
+          "w": 12,
+          "h": 7,
           "scale": 1
         },
         {
           "id": "u2",
-          "type": "DIRECTIONS",
-          "x": 0,
-          "y": 18,
-          "w": 12,
-          "h": 3,
-          "scale": 1
-        },
-        {
-          "id": "u3",
-          "type": "SPEED_LIMIT",
+          "type": "MEDIA",
           "x": 12,
-          "y": 18,
-          "w": 6,
-          "h": 3,
-          "scale": 1
-        },
-        {
-          "id": "u4",
-          "type": "SPEED",
-          "x": 18,
-          "y": 18,
-          "w": 6,
-          "h": 3,
+          "y": 14,
+          "w": 12,
+          "h": 7,
           "scale": 1
         }
       ]
@@ -154,62 +145,53 @@
       "enabled": true,
       "cells": [
         {
-          "id": "l5",
-          "type": "TRIP_COMPUTER",
+          "id": "l0",
+          "type": "CLOCK",
           "x": 0,
           "y": 0,
-          "w": 12,
-          "h": 7,
-          "scale": 1
-        },
-        {
-          "id": "l6",
-          "type": "SPEED_GAUGE",
-          "x": 12,
-          "y": 0,
-          "w": 12,
-          "h": 7,
-          "scale": 1
-        },
-        {
-          "id": "l7",
-          "type": "DOORS",
-          "x": 0,
-          "y": 7,
-          "w": 12,
-          "h": 7,
-          "scale": 1
-        },
-        {
-          "id": "l8",
-          "type": "VOLTAGE",
-          "x": 12,
-          "y": 7,
-          "w": 12,
-          "h": 4,
-          "scale": 1
-        },
-        {
-          "id": "l9",
-          "type": "FUEL",
-          "x": 12,
-          "y": 11,
-          "w": 12,
+          "w": 24,
           "h": 3,
           "scale": 1
         },
         {
-          "id": "l10",
-          "type": "CLOCK",
+          "id": "l1",
+          "type": "TRIP_COMPUTER",
           "x": 0,
-          "y": 14,
-          "w": 24,
-          "h": 4,
+          "y": 3,
+          "w": 12,
+          "h": 9,
           "scale": 1
         },
         {
-          "id": "l11",
-          "type": "DOCK",
+          "id": "l2",
+          "type": "DOORS",
+          "x": 12,
+          "y": 3,
+          "w": 12,
+          "h": 9,
+          "scale": 1
+        },
+        {
+          "id": "l3",
+          "type": "SERVICE",
+          "x": 0,
+          "y": 12,
+          "w": 12,
+          "h": 6,
+          "scale": 1
+        },
+        {
+          "id": "l4",
+          "type": "FUEL",
+          "x": 12,
+          "y": 12,
+          "w": 12,
+          "h": 6,
+          "scale": 1
+        },
+        {
+          "id": "l5",
+          "type": "CAR_APPS",
           "x": 0,
           "y": 18,
           "w": 24,
@@ -224,39 +206,30 @@
       "enabled": true,
       "cells": [
         {
-          "id": "r12",
+          "id": "r0",
           "type": "MEDIA",
           "x": 0,
           "y": 0,
           "w": 24,
-          "h": 11,
+          "h": 14,
           "scale": 1
         },
         {
-          "id": "r13",
+          "id": "r1",
+          "type": "SPEED_GAUGE",
+          "x": 0,
+          "y": 14,
+          "w": 12,
+          "h": 7,
+          "scale": 1
+        },
+        {
+          "id": "r2",
           "type": "CLOCK",
-          "x": 0,
-          "y": 11,
-          "w": 24,
-          "h": 5,
-          "scale": 1
-        },
-        {
-          "id": "r14",
-          "type": "WEATHER",
-          "x": 0,
-          "y": 16,
-          "w": 12,
-          "h": 5,
-          "scale": 1
-        },
-        {
-          "id": "r15",
-          "type": "DIRECTIONS",
           "x": 12,
-          "y": 16,
+          "y": 14,
           "w": 12,
-          "h": 5,
+          "h": 7,
           "scale": 1
         }
       ]
@@ -265,7 +238,53 @@
       "slot": "DOWN",
       "name": "Jízda",
       "enabled": true,
-      "cells": []
+      "cells": [
+        {
+          "id": "d0",
+          "type": "PERF",
+          "x": 0,
+          "y": 0,
+          "w": 24,
+          "h": 5,
+          "scale": 1
+        },
+        {
+          "id": "d1",
+          "type": "GPS",
+          "x": 0,
+          "y": 5,
+          "w": 12,
+          "h": 7,
+          "scale": 1
+        },
+        {
+          "id": "d2",
+          "type": "VOLTAGE",
+          "x": 12,
+          "y": 5,
+          "w": 12,
+          "h": 7,
+          "scale": 1
+        },
+        {
+          "id": "d3",
+          "type": "DOORS",
+          "x": 0,
+          "y": 12,
+          "w": 12,
+          "h": 9,
+          "scale": 1
+        },
+        {
+          "id": "d4",
+          "type": "TRIP_COMPUTER",
+          "x": 12,
+          "y": 12,
+          "w": 12,
+          "h": 9,
+          "scale": 1
+        }
+      ]
     }
   ],
   "quickDialNote": "Skutečná jména kontaktů z rádia sem nedáváme (repozitář je veřejný). Zadej si je v sandboxu podržením kolečka – uloží se jen v telefonu."
