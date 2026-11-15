@@ -1,0 +1,272 @@
+{
+ "radioVersion": "2.11",
+ "capturedAt": "2026-11-15T16:10:00+01:00",
+ "source": "Fotky obrazovky rádia z 15. 11. 2026 (IMG_2805, IMG_2806); ostatní plochy podle výchozího rozložení 2.11, plocha Jízda je v rádiu prázdná.",
+ "screen": {
+  "width": 768,
+  "height": 1024,
+  "topBar": 174,
+  "bottomBar": 170,
+  "density": 1.0
+ },
+ "rows": 21,
+ "appearance": {
+  "accent": 4283417591,
+  "background": 4,
+  "cardAlpha": 0.72,
+  "corner": 22,
+  "gap": 8,
+  "border": true,
+  "textScale": 1.0,
+  "animations": true,
+  "titles": true,
+  "darkMap": true,
+  "mapStyle": "carto_voyager",
+  "seconds": false,
+  "cardTint": false,
+  "theme": "dark",
+  "font": "default",
+  "intro": true,
+  "introStyle": "photo",
+  "introSeconds": 4.0
+ },
+ "quickDial": [
+  {
+   "name": "Kontakt 1",
+   "number": ""
+  },
+  {
+   "name": "Kontakt 2",
+   "number": ""
+  },
+  {
+   "name": "Kontakt 3",
+   "number": ""
+  },
+  {
+   "name": "Kontakt 4",
+   "number": ""
+  },
+  {
+   "name": "Kontakt 5",
+   "number": ""
+  }
+ ],
+ "pages": [
+  {
+   "slot": "CENTER",
+   "name": "Domů",
+   "enabled": true,
+   "cells": [
+    {
+     "id": "h1",
+     "type": "PHONE_DIAL",
+     "x": 0,
+     "y": 0,
+     "w": 3,
+     "h": 21,
+     "scale": 1
+    },
+    {
+     "id": "h2",
+     "type": "SPEED_GAUGE",
+     "x": 3,
+     "y": 0,
+     "w": 10,
+     "h": 12,
+     "scale": 1
+    },
+    {
+     "id": "h3",
+     "type": "TRIP_COMPUTER",
+     "x": 13,
+     "y": 0,
+     "w": 11,
+     "h": 12,
+     "scale": 1
+    },
+    {
+     "id": "h4",
+     "type": "DOORS",
+     "x": 3,
+     "y": 12,
+     "w": 13,
+     "h": 9,
+     "scale": 1
+    },
+    {
+     "id": "h5",
+     "type": "MEDIA",
+     "x": 16,
+     "y": 12,
+     "w": 8,
+     "h": 9,
+     "scale": 1
+    }
+   ]
+  },
+  {
+   "slot": "UP",
+   "name": "Mapa",
+   "enabled": true,
+   "cells": [
+    {
+     "id": "u1",
+     "type": "MAP",
+     "x": 0,
+     "y": 0,
+     "w": 24,
+     "h": 18,
+     "scale": 1
+    },
+    {
+     "id": "u2",
+     "type": "DIRECTIONS",
+     "x": 0,
+     "y": 18,
+     "w": 12,
+     "h": 3,
+     "scale": 1
+    },
+    {
+     "id": "u3",
+     "type": "SPEED_LIMIT",
+     "x": 12,
+     "y": 18,
+     "w": 6,
+     "h": 3,
+     "scale": 1
+    },
+    {
+     "id": "u4",
+     "type": "SPEED",
+     "x": 18,
+     "y": 18,
+     "w": 6,
+     "h": 3,
+     "scale": 1
+    }
+   ]
+  },
+  {
+   "slot": "LEFT",
+   "name": "Auto",
+   "enabled": true,
+   "cells": [
+    {
+     "id": "l5",
+     "type": "TRIP_COMPUTER",
+     "x": 0,
+     "y": 0,
+     "w": 12,
+     "h": 7,
+     "scale": 1
+    },
+    {
+     "id": "l6",
+     "type": "SPEED_GAUGE",
+     "x": 12,
+     "y": 0,
+     "w": 12,
+     "h": 7,
+     "scale": 1
+    },
+    {
+     "id": "l7",
+     "type": "DOORS",
+     "x": 0,
+     "y": 7,
+     "w": 12,
+     "h": 7,
+     "scale": 1
+    },
+    {
+     "id": "l8",
+     "type": "VOLTAGE",
+     "x": 12,
+     "y": 7,
+     "w": 12,
+     "h": 4,
+     "scale": 1
+    },
+    {
+     "id": "l9",
+     "type": "FUEL",
+     "x": 12,
+     "y": 11,
+     "w": 12,
+     "h": 3,
+     "scale": 1
+    },
+    {
+     "id": "l10",
+     "type": "CLOCK",
+     "x": 0,
+     "y": 14,
+     "w": 24,
+     "h": 4,
+     "scale": 1
+    },
+    {
+     "id": "l11",
+     "type": "DOCK",
+     "x": 0,
+     "y": 18,
+     "w": 24,
+     "h": 3,
+     "scale": 1
+    }
+   ]
+  },
+  {
+   "slot": "RIGHT",
+   "name": "Hudba",
+   "enabled": true,
+   "cells": [
+    {
+     "id": "r12",
+     "type": "MEDIA",
+     "x": 0,
+     "y": 0,
+     "w": 24,
+     "h": 11,
+     "scale": 1
+    },
+    {
+     "id": "r13",
+     "type": "CLOCK",
+     "x": 0,
+     "y": 11,
+     "w": 24,
+     "h": 5,
+     "scale": 1
+    },
+    {
+     "id": "r14",
+     "type": "WEATHER",
+     "x": 0,
+     "y": 16,
+     "w": 12,
+     "h": 5,
+     "scale": 1
+    },
+    {
+     "id": "r15",
+     "type": "DIRECTIONS",
+     "x": 12,
+     "y": 16,
+     "w": 12,
+     "h": 5,
+     "scale": 1
+    }
+   ]
+  },
+  {
+   "slot": "DOWN",
+   "name": "Jízda",
+   "enabled": true,
+   "cells": []
+  }
+ ],
+ "quickDialNote": "Skutečná jména kontaktů z rádia sem nedáváme (repozitář je veřejný). Zadej si je v sandboxu podržením kolečka – uloží se jen v telefonu."
+}

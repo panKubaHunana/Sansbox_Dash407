@@ -1,0 +1,11 @@
+{
+  "version": "1.0.0",
+  "radioVersion": "2.11",
+  "date": "2026-11-15",
+  "notes": [
+    "První verze sandboxu: kopie launcheru Dash 407 z rádia (verze 2.11).",
+    "Obrazovka 768 × 1024 s horní lištou jednotky a spodní lištou klimatizace, plocha pro widgety 768 × 680, mřížka 24 × 21.",
+    "Plocha Domů podle fotky z 15. 11.: rychlá volba, rychloměr, jízda, stav vozu, přehrávač.",
+    "Odeslání změn Claudovi jako úkol na GitHubu, kontrola aktualizací sandboxu i verze v rádiu."
+  ]
+}
