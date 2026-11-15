@@ -45,10 +45,25 @@ function arcPath(cx, cy, r, a0, sweep) {
 const W_RENDER = {
   /* ---------- Jízda ---------- */
   SPEED(c, W, H) {
-    return card(W, H, { title: 'Rychlost' }, (cw, ch) => {
-      const lh = spN(14) * 1.2;
-      return fit(GPS.speed == null ? DASH : String(GPS.speed), 0, 0, cw, ch - lh, { weight: 700, maxSp: 160, wpc: 0.62 }) +
-        `<div style="position:absolute;bottom:0;width:100%;text-align:center;color:${P.Muted};font-size:${sp(14)}">km/h · GPS</div>`;
+    // Navigace (dřív Rychlost): v rozích spotřeba, dojezd, příjezd do cíle a zbývající km, uprostřed velká rychlost.
+    return card(W, H, { pad: 10 }, (cw, ch) => {
+      const showRows = ch > 150 && cw > 150;
+      const lab = clamp(Math.min(cw / 17, ch / 11.5, 18), 12, 18), val = lab * 1.4;
+      const rowH = showRows ? (lab + val) * FS * 1.2 : 0;
+      const rangeCol = (CAR.rangeKm == null ? 999 : CAR.rangeKm) < 80 ? P.Amber : LOOK.accent;
+      const nav = (typeof NAVSIM !== 'undefined' && NAVSIM.active) ? NAVSIM : null;
+      const arrival = nav ? new Date(Date.now() + nav.remainingS * 1000).toLocaleTimeString('cs', { hour: 'numeric', minute: '2-digit' }) : DASH;
+      const left = nav ? (nav.remainingM < 10000 ? decimal(nav.remainingM / 1000) : String(Math.round(nav.remainingM / 1000))) : DASH;
+      const rd = (l, v, col) => `<div class="col" style="flex:1;align-items:center;min-width:0"><div class="nowrap" style="color:${P.Text};font-size:${sp(lab)}">${esc(l)}</div><div class="nowrap" style="color:${col};font-size:${sp(val)}">${esc(v)}</div></div>`;
+      const row = (y, a, b2) => `<div class="row" style="position:absolute;${y};left:0;width:${cw}px">${a}${b2}</div>`;
+      if (!showRows) {
+        const lh = 12 * FS * 1.2;
+        return fit(GPS.speed == null ? DASH : String(GPS.speed), 0, 0, cw, ch - lh, { weight: 700, maxSp: 160, wpc: 0.62 }) +
+          `<div style="position:absolute;bottom:0;width:100%;text-align:center;color:${P.Muted};font-size:${sp(12)}">km/h</div>`;
+      }
+      return row('top:0', rd('okamž. spotřeba', CAR.instantL100 != null ? decimal(CAR.instantL100) + ' l' : DASH + ' l', LOOK.accent), rd('dojezd km', CAR.rangeKm != null ? String(CAR.rangeKm) : DASH, rangeCol)) +
+        fit(GPS.speed == null ? DASH : String(GPS.speed), 0, rowH, cw, ch - 2 * rowH, { weight: 700, maxSp: 160, wpc: 0.62 }) +
+        row('bottom:0', rd('příjezd do cíle', arrival, LOOK.accent), rd('zbývá km', left, LOOK.accent));
     });
   },
   SPEED_GAUGE(c, W, H) {
@@ -247,14 +262,16 @@ const W_RENDER = {
   },
   MEDIA(c, W, H) {
     const m = mediaState();
-    const big = clamp(Math.min((H - 24) * 0.36, 76), 40, 76), small = big * 0.86;
+    // Tlačítka se musí vejít vedle sebe: velké + 2 × malé (0,86) + 2 mezery 8 px v šířce bez okrajů (2 × 22 px).
+    const inner = W - 44;
+    const big = clamp(Math.min((H - 24) * 0.36, 76, (inner - 16) / 2.72), 32, 76), small = big * 0.86;
     const titleSp = clamp(Math.min((H - 24) * 0.13, 32), 16, 32);
     const bg = `linear-gradient(135deg,#3D8FC4,#7466A6,#B8735E,#1A1414)`;
     return `<div class="card clickable" data-act="media:open" style="left:0;top:0;width:${W}px;height:${H}px;border-radius:${LOOK.corner}px;background:${bg}">` +
-      `<div class="fill" style="background:linear-gradient(transparent, rgba(0,0,0,.3))"></div>` +
+      `<div class="fill" style="background:linear-gradient(rgba(0,0,0,.1), rgba(0,0,0,.45))"></div>` +
       `<div class="col" style="position:absolute;inset:0;padding:12px 22px;align-items:center">` +
-      `<div style="flex:1.1"></div><div class="row" style="max-width:100%">${icon('music_note', titleSp * 1.1, '#fff')}<div class="nowrap" style="color:#fff;font-size:${sp(titleSp)};font-weight:500">${esc(m.title)}</div></div>` +
-      (m.artist ? `<div class="nowrap" style="max-width:100%;color:rgba(255,255,255,.8);font-size:${sp(titleSp * 0.65)}">${esc(m.artist)}</div>` : '') +
+      `<div style="flex:1.1"></div><div class="row" style="max-width:100%;text-shadow:0 2px 6px rgba(0,0,0,.8)">${icon('music_note', titleSp * 1.1, '#fff')}<div class="nowrap" style="color:#fff;font-size:${sp(titleSp)};font-weight:500">${esc(m.title)}</div></div>` +
+      (m.artist ? `<div class="nowrap" style="max-width:100%;text-shadow:0 2px 6px rgba(0,0,0,.8);color:rgba(255,255,255,.85);font-size:${sp(titleSp * 0.65)}">${esc(m.artist)}</div>` : '') +
       `<div style="flex:.5"></div><div class="row" style="width:100%;justify-content:space-between">${roundBtn('skip_previous', small, false, 'media:prev')}${roundBtn(m.playing ? 'pause' : 'play_arrow', big, true, 'media:play')}${roundBtn('skip_next', small, false, 'media:next')}</div><div style="flex:.15"></div></div></div>`;
   },
   DOCK(c, W, H) {
@@ -285,7 +302,7 @@ const W_RENDER = {
           h += name(k ? k.name : 'Přidat', k ? P.Text : P.Muted);
           h += `<div class="rbtn clickable" data-act="dial:${i}" data-long="dialedit:${i}" style="width:${ic}px;height:${ic}px;background:${k ? '#10E01A' : tA(0.08)}">${k ? `<span style="color:#fff;font-size:${ic * 0.38 * FS}px;font-weight:700">${esc(initials(k.name))}</span>` : icon('add', ic * 0.45, P.Muted)}</div>`;
         } else {
-          h += name('Kontakty', P.Text) + `<div class="rbtn clickable" data-act="contacts" style="width:${ic}px;height:${ic}px;background:#F1F3F6">${icon('contacts', ic * 0.5, LOOK.accent)}</div>`;
+          h += name('Kontakty', P.Text) + `<div class="rbtn clickable" data-act="contacts" style="width:${ic}px;height:${ic}px;background:#F1F3F6">${icon('contacts', ic * 0.5, '#1E88E5')}</div>`;
         }
         return h + `</div>`;
       };

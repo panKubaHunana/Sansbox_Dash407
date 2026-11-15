@@ -1,11 +1,11 @@
 {
-  "version": "2.12",
-  "radioVersion": "2.12",
+  "version": "2.13",
+  "radioVersion": "2.13",
   "date": "2026-11-15",
   "notes": [
-    "Návrhy ke schválení: Claude pošle úpravy rádia nejdřív do sandboxu. Prohlédneš si je v náhledu a jedním tlačítkem „Schválit a nahrát“ je pošleš do rádia.",
-    "U návrhu můžeš poslat připomínky – do rádia se pak nic nenahraje.",
-    "Stav rádia a náhled návrhu jsou oddělené, tvoje rozložení se nepřepíše."
+    "Navigace: mapa se už nesmyslně neotáčí",
+    "Navigace: nové tlačítko kompas – sever nahoře / mapa ve směru jízdy",
+    "Navigace: nový widget s rychlostí, spotřebou, dojezdem, příjezdem do cíle a zbývajícími km (dřív Rychlost)"
   ],
-  "build": 4
+  "build": 1
 }

@@ -1,8 +1,8 @@
 'use strict';
 /* Sandbox Dash 407 – jádro: stav, vzhled, mřížka, rozložení ploch a data (kopie logiky z launcheru v rádiu). */
 
-const APP_VERSION = '2.12'; // vždy stejná jako verze Dash 407 v rádiu
-const APP_BUILD = 4; // skryté číslo sestavení sandboxu – opravy jen v sandboxu, verze se nemění
+const APP_VERSION = '2.13'; // vždy stejná jako verze Dash 407 v rádiu
+const APP_BUILD = 1; // skryté číslo sestavení sandboxu – opravy jen v sandboxu, verze se nemění
 const SANDBOX_REPO = 'panKubaHunana/Sansbox_Dash407';
 const RADIO_REPO = 'panKubaHunana/Dashboard_Peugeot_407';
 const SCREEN_W = 768, SCREEN_H = 1024, TOP_BAR = 174, BOTTOM_BAR = 170;
@@ -123,11 +123,11 @@ const CATEGORIES = { DRIVING: 'Jízda', NAVIGATION: 'Navigace', VEHICLE: 'Vozidl
 // [název, popis, kategorie, šířka, výška, min. šířka, min. výška] v původní mřížce 4 × 12
 const WT = {
   MAP: ['Mapa', 'Mapa Mapy.com s polohou auta a naplánovanou trasou', 'NAVIGATION', 4, 4, 2, 2],
-  DIRECTIONS: ['Navigace', 'Další manévr z Mapy.com, cíl a příjezd, rychlé cíle Domů a Práce', 'NAVIGATION', 2, 3, 2, 2],
+  DIRECTIONS: ['Navigační pokyny', 'Další manévr z Mapy.com, cíl a příjezd, rychlé cíle Domů a Práce', 'NAVIGATION', 2, 3, 2, 2],
   SPEED_LIMIT: ['Povolená rychlost', 'Omezení na silnici, kde jedeš (OpenStreetMap)', 'NAVIGATION', 1, 2, 1, 2],
   COMPASS: ['Kompas', 'Směr jízdy, nadmořská výška a rychlost z GPS', 'NAVIGATION', 2, 3, 1, 2],
   GPS: ['GPS', 'Satelity, přesnost, výška a stáří polohy', 'NAVIGATION', 2, 3, 2, 2],
-  SPEED: ['Rychlost', 'Velká digitální rychlost z GPS', 'DRIVING', 2, 3, 1, 2],
+  SPEED: ['Navigace', 'Velká rychlost z GPS, spotřeba a dojezd z auta, příjezd do cíle a zbývající km', 'NAVIGATION', 2, 3, 1, 2],
   SPEED_GAUGE: ['Rychloměr a spotřeba', 'Obloukový rychloměr a pod ním okamžitá a průměrná spotřeba, ujeto a dojezd z auta', 'DRIVING', 2, 4, 2, 2],
   TRIP: ['Jízda', 'Ujetá vzdálenost, čas, průměr, maximum, odhad paliva a ceny', 'DRIVING', 2, 3, 2, 2],
   GFORCE: ['Přetížení', 'Boční a podélné přetížení v g se špičkami', 'DRIVING', 2, 3, 2, 2],
