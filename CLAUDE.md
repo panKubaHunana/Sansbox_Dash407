@@ -16,6 +16,10 @@ Kuba přes týden nemůže zkoušet v rádiu, proto **nikdy nenahrávej změny r
 4. Připomínky přijdou jako úkol „Připomínky k návrhu X“ v tomto repu → uprav větev i `navrh/` a pošli znovu (aktualizuj `created` v proposal.json).
 5. Commity do main rádia mimo schválení (jen workflow) označ `[skip ci]`, aby nevznikla nová verze.
 
+## Changelog (Kubovo přání)
+- Stručně, jen podstatné změny, jedna krátká věta na řádek ve tvaru „Oblast: co je nového“ (např. „Navigace: nové tlačítko kompas – sever nahoře / mapa ve směru jízdy“).
+- Drobnosti (velikosti, barvy ikon, zarovnání) neuvádět. Platí pro `.github/release-notes.md` rádia i `notes` v sandboxu.
+
 ## Zásady
 - Rozměry 1:1 s rádiem: 768 × 1024, lišty 174/170 px, 1 dp = 1 px. Velikosti písma a výpočty kopírují Kotlin kód.
 - Repozitář je veřejný: žádná jména a čísla kontaktů, žádné API klíče.

@@ -3,12 +3,8 @@
   "radioVersion": "2.13",
   "date": "2026-11-15",
   "notes": [
-    "Přehrávač: tlačítka předchozí – přehrát – další se zmenší podle šířky widgetu, vejdou se i do úzkého přehrávače.",
-    "Přehrávač: tmavší přechod přes obal alba a stín pod názvem skladby (čitelné i přes světlý obrázek).",
-    "Rychlá volba: ikona Kontaktů má pevnou modrou barvu (nemění se s barvou zvýraznění).",
-    "Navigace: mapa se už při stání neotáčí nesmyslně – směr z GPS se bere jen od 8 km/h, jinak platí poslední dobrý směr; na začátku navigace se mapa natočí podle směru trasy. Otáčení je plynulé.",
-    "Navigace: nové tlačítko kompasu na mapě přepíná sever nahoře / mapa po směru jízdy.",
-    "Pozn.: natočení mapy při navigaci sandbox neukáže (potřebuje skutečnou GPS v autě) – ověříš až v rádiu."
+    "Navigace: mapa se už nesmyslně neotáčí",
+    "Navigace: nové tlačítko kompas – sever nahoře / mapa ve směru jízdy"
   ],
   "build": 1
 }
