@@ -1,9 +1,14 @@
 {
-  "version": "3.0.1",
-  "radioVersion": "3.0.1",
+  "version": "3.0.2",
+  "radioVersion": "3.0.2",
   "date": "2026-11-16",
   "notes": [
-    "Kniha jízd: opraven pád při otevření Teplotní mapy"
+    "Tankování a servisní knížka: data se ukládají bezpečně a výpadek proudu je už nesmaže",
+    "Kniha jízd: ukázkový režim už nezapisuje vymyšlené jízdy",
+    "Kniha jízd: nepřesné body GPS se nepřičítají do ujetých km",
+    "Kniha jízd: jízda nezačne při vypnutém rádiu a zhasnutí displeje ji při běžícím motoru (OBD) nerozdělí",
+    "OBD: po výpadku spojení se adaptér sám znovu připojí",
+    "Internet: názvy míst se při chybě serveru už nestahují dokola"
   ],
   "build": 1
 }
