@@ -16,6 +16,11 @@ Kuba přes týden nemůže zkoušet v rádiu, proto **nikdy nenahrávej změny r
 4. Připomínky přijdou jako úkol „Připomínky k návrhu X“ v tomto repu → uprav větev i `navrh/` a pošli znovu (aktualizuj `created` v proposal.json).
 5. Commity do main rádia mimo schválení (jen workflow) označ `[skip ci]`, aby nevznikla nová verze.
 
+## Kompilace přímo v chatu (Kuba povolil adresy Google, Gradle a Maven Central)
+- SDK (jen pro aktuální chat, cca 1 min): `curl -o /tmp/clt.zip https://dl.google.com/android/repository/commandlinetools-linux-11076708_latest.zip`, rozbalit do `/opt/android-sdk/cmdline-tools/latest`, `yes | sdkmanager --licenses`, `sdkmanager "platforms;android-35" "build-tools;35.0.0"`; v repu rádia `local.properties` se `sdk.dir=/opt/android-sdk` (je v .gitignore).
+- `gradle :app:assembleDebug` (poprvé ~4,5 min, pak rychleji). Snímky lokálně: zkopíruj `.github/snapshots/*.kt` do `app/src/test/java/cz/kuba/dash407/`, dočasně přidej plugin `app.cash.paparazzi` 1.3.5 a spusť `gradle :app:recordPaparazziDebug` → `app/src/test/snapshots/images/`; pak build.gradle.kts vrať a test smaž.
+- Každou změnu rádia zkompiluj a prohlédni lokálně ještě před pushem.
+
 ## Changelog (Kubovo přání)
 - Stručně, jen podstatné změny, jedna krátká věta na řádek ve tvaru „Oblast: co je nového“ (např. „Navigace: nové tlačítko kompas – sever nahoře / mapa ve směru jízdy“).
 - Drobnosti (velikosti, barvy ikon, zarovnání) neuvádět. Platí pro `.github/release-notes.md` rádia i `notes` v sandboxu.
