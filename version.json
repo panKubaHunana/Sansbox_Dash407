@@ -1,16 +1,9 @@
 {
-  "version": "3.0",
-  "radioVersion": "3.0",
+  "version": "3.0.1",
+  "radioVersion": "3.0.1",
   "date": "2026-11-16",
   "notes": [
-    "Kniha jízd: jízda začíná startem motoru a končí jeho vypnutím, bez čekání mezi jízdami",
-    "Kniha jízd: zapisují se jízdy od 100 m",
-    "Kniha jízd: tachometr přímo z CAN boxu (Zadat stav › Najít v CAN boxu)",
-    "Záloha: všechna data v jednom souboru, ručně i automaticky každý den, volitelně na Google Disk",
-    "Aplikace: ostré sestavení – mnohem menší APK a rychlejší start",
-    "Pády: záznam chyb a tlačítko Odeslat hlášení na GitHub",
-    "Bez internetu: dotazy čekají ve frontě, mapa a čerpací stanice fungují z paměti",
-    "Rychlost: barva podle překročení rychlosti v obci, mimo obec a na dálnici"
+    "Kniha jízd: opraven pád při otevření Teplotní mapy"
   ],
   "build": 1
 }

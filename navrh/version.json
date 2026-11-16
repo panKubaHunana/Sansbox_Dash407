@@ -1,9 +1,0 @@
-{
-  "version": "3.0.1",
-  "radioVersion": "3.0.1",
-  "date": "2026-11-16",
-  "notes": [
-    "Kniha jízd: opraven pád při otevření Teplotní mapy"
-  ],
-  "build": 1
-}
