@@ -1,5 +1,5 @@
 /* Service worker sandboxu: aplikace funguje i bez internetu; version.json a radio-state.json vždy čerstvé. */
-const CACHE = 'sbx407-2.13-b2';
+const CACHE = 'sbx407-3.0-b1';
 const FILES = ['./', 'index.html', 'style.css', 'js/core.js', 'js/widgets.js', 'js/ui.js', 'js/panels.js', 'js/sandbox.js',
   'manifest.webmanifest', 'radio-state.json', 'assets/car_407sw.png', 'assets/intro_peugeot.jpg', 'icons/icon-180.png', 'icons/icon-192.png', 'icons/icon-512.png',
   'fonts/fonts.css', 'fonts/material-icons.woff2', 'fonts/roboto-condensed-latin-400-normal.woff2', 'fonts/roboto-condensed-latin-700-normal.woff2', 'fonts/roboto-condensed-latin-ext-400-normal.woff2', 'fonts/roboto-condensed-latin-ext-700-normal.woff2', 'fonts/roboto-latin-300-normal.woff2', 'fonts/roboto-latin-400-normal.woff2', 'fonts/roboto-latin-500-normal.woff2', 'fonts/roboto-latin-700-normal.woff2', 'fonts/roboto-latin-ext-300-normal.woff2', 'fonts/roboto-latin-ext-400-normal.woff2', 'fonts/roboto-latin-ext-500-normal.woff2', 'fonts/roboto-latin-ext-700-normal.woff2', 'fonts/roboto-mono-latin-400-normal.woff2', 'fonts/roboto-mono-latin-ext-400-normal.woff2', 'fonts/roboto-serif-latin-400-normal.woff2', 'fonts/roboto-serif-latin-700-normal.woff2', 'fonts/roboto-serif-latin-ext-400-normal.woff2', 'fonts/roboto-serif-latin-ext-700-normal.woff2'];

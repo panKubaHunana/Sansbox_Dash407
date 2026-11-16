@@ -126,6 +126,7 @@ function settingsBody() {
   const pr = S.prefs;
   let h = sect('Ukázkový režim a data z auta') + `<div style="color:${P.Muted};font-size:15px;margin-bottom:8px">V rádiu chodí data z CAN boxu. Sandbox je nemá, proto volíš zdroj:</div><div class="hscroll">${pill('Snímek z rádia (15. 11.)', pr.dataMode === 'snapshot', 'mode:snapshot')}${pill('Ukázková jízda', pr.dataMode === 'demo', 'mode:demo')}${pill('Bez auta', pr.dataMode === 'off', 'mode:off')}</div>`;
   h += `<div style="color:${P.Muted};font-size:13px;margin-top:6px">Ukázková jízda = vymyšlená jízda kolem Hradce Králové (stejná jako Ukázkový režim v rádiu). Rychlost a poloha jinak jdou z GPS telefonu.</div>`;
+  h += sect('Barva rychlosti – typ silnice') + `<div class="hscroll">${pill('Podle mapy (jako rádio)', pr.testRoad === 'auto', 'road:auto')}${pill('V obci', pr.testRoad === 'town', 'road:town')}${pill('Mimo obec', pr.testRoad === 'rural', 'road:rural')}${pill('Dálnice', pr.testRoad === 'motorway', 'road:motorway')}</div><div style="color:${P.Muted};font-size:13px;margin-top:6px">Rádio pozná typ silnice z OpenStreetMap. Tady ho můžeš zvolit ručně a v Ukázkové jízdě (25–115 km/h) vyzkoušet zelenou, oranžovou a červenou. Teď: ${SPEED_ZONES[roadZone()][0]}.</div>`;
   h += sect('Navigace') + tf('Domů', 'homeAddress', pr.homeAddress) + tf('Práce', 'workAddress', pr.workAddress) + `<div style="color:${P.Muted};font-size:13px;margin-top:6px">Mapy.com a Google klíče se v sandboxu nezadávají – mapa používá CARTO bez klíče.</div>`;
   h += sect('Hudba') + `<div class="srow"><div class="lab">Výchozí přehrávač</div><div style="color:${P.Muted}">${esc(pr.musicApp)}</div></div>`;
   h += sect('Tankování') + sw('Automatické tankování (okno „Tankoval jsi?“ u pumpy)', pr.autoFuel, 'pref:autoFuel');
@@ -332,6 +333,7 @@ function act(name, el) {
       render(); return;
     /* nastavení */
     case 'mode': S.prefs.dataMode = b; demoT = 0; save(); carTick(); render(); refreshPanel(); return;
+    case 'road': S.prefs.testRoad = b; save(); render(); refreshPanel(); return;
     case 'pref': S.prefs[b] = !S.prefs[b]; save(); render(); refreshPanel(); return;
     case 'layout':
       dialog('Obnovit rozložení?', 'Všechny plochy dostanou rozložení, které je teď v rádiu. Tvoje úpravy rozložení v sandboxu se ztratí.', [['Zrušit', 'dlgclose'], ['Obnovit', 'layoutreset']]);

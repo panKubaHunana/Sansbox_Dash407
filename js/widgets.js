@@ -26,8 +26,21 @@ function fit(text, x, y, w, h, o = {}) {
   const px = Math.min(dp, (o.maxSp || 120) * FS);
   return `<div class="fit" style="left:${x}px;top:${y}px;width:${w}px;height:${h}px;justify-content:${o.align || 'center'};color:${o.color || P.Text};font-size:${px}px;line-height:${px * 1.05}px;font-weight:${o.weight || 500}">${esc(text)}</div>`;
 }
-function statRow(label, value) {
-  return `<div class="row" style="width:100%"><div class="nowrap" style="flex:1;color:${P.Muted};font-size:${sp(15)}">${esc(label)}</div><div class="nowrap" style="color:${P.Text};font-size:${sp(15)};font-weight:500">${esc(value)}</div></div>`;
+function statRow(label, value, color) {
+  return `<div class="row" style="width:100%"><div class="nowrap" style="flex:1;color:${P.Muted};font-size:${sp(15)}">${esc(label)}</div><div class="nowrap" style="color:${color || P.Text};font-size:${sp(15)};font-weight:500">${esc(value)}</div></div>`;
+}
+/* Barva aktuální rychlosti podle typu silnice (jako SpeedZone.kt v rádiu). */
+const SPEED_ZONES = { town: ['v obci', 50, 54], rural: ['mimo obec', 90, 99], motorway: ['dálnice', 130, 145] };
+const SPEED_COL = { green: '#04A439', orange: '#D1E308', red: '#C00404' };
+function roadZone() {
+  const o = S.prefs.testRoad; // jen sandbox: ruční volba typu silnice pro vyzkoušení barev
+  if (o && o !== 'auto') return o;
+  return SpeedLimit.zone || 'rural';
+}
+function speedColor(v, fallback) {
+  if (v == null) return fallback || P.Text;
+  const z = SPEED_ZONES[roadZone()];
+  return v >= z[2] ? SPEED_COL.red : v >= z[1] ? SPEED_COL.orange : SPEED_COL.green;
 }
 function reading(value, label, color) {
   return `<div class="col"><div class="nowrap" style="color:${color || P.Text};font-size:${sp(26)};font-weight:700">${esc(value)}</div><div class="nowrap" style="color:${P.Muted};font-size:${sp(13)}">${esc(label)}</div></div>`;
@@ -58,11 +71,11 @@ const W_RENDER = {
       const row = (y, a, b2) => `<div class="row" style="position:absolute;${y};left:0;width:${cw}px">${a}${b2}</div>`;
       if (!showRows) {
         const lh = 12 * FS * 1.2;
-        return fit(GPS.speed == null ? DASH : String(GPS.speed), 0, 0, cw, ch - lh, { weight: 700, maxSp: 160, wpc: 0.62 }) +
+        return fit(GPS.speed == null ? DASH : String(GPS.speed), 0, 0, cw, ch - lh, { weight: 700, maxSp: 160, wpc: 0.62, color: speedColor(GPS.speed) }) +
           `<div style="position:absolute;bottom:0;width:100%;text-align:center;color:${P.Muted};font-size:${sp(12)}">km/h</div>`;
       }
       return row('top:0', rd('okamž. spotřeba', CAR.instantL100 != null ? decimal(CAR.instantL100) + ' l' : DASH + ' l', LOOK.accent), rd('dojezd km', CAR.rangeKm != null ? String(CAR.rangeKm) : DASH, rangeCol)) +
-        fit(GPS.speed == null ? DASH : String(GPS.speed), 0, rowH, cw, ch - 2 * rowH, { weight: 700, maxSp: 160, wpc: 0.62 }) +
+        fit(GPS.speed == null ? DASH : String(GPS.speed), 0, rowH, cw, ch - 2 * rowH, { weight: 700, maxSp: 160, wpc: 0.62, color: speedColor(GPS.speed) }) +
         row('bottom:0', rd('příjezd do cíle', arrival, LOOK.accent), rd('zbývá km', left, LOOK.accent));
     });
   },
@@ -80,11 +93,11 @@ const W_RENDER = {
       const ox = (cw - side) / 2, oy = (gh - side) / 2;
       let s = `<svg style="position:absolute;left:${ox}px;top:${oy}px" width="${side}" height="${side}">` +
         `<path d="${arcPath(side / 2, side / 2, r, 135, 270)}" fill="none" stroke="${tA(0.1)}" stroke-width="${stroke}" stroke-linecap="round"/>`;
-      if (part > 0) s += `<path d="${arcPath(side / 2, side / 2, r, 135, Math.max(0.5, 270 * part))}" fill="none" stroke="${(speed || 0) > 130 ? P.Amber : LOOK.accent}" stroke-width="${stroke}" stroke-linecap="round"/>`;
+      if (part > 0) s += `<path d="${arcPath(side / 2, side / 2, r, 135, Math.max(0.5, 270 * part))}" fill="none" stroke="${speedColor(speed)}" stroke-width="${stroke}" stroke-linecap="round"/>`;
       s += `</svg>`;
       const big = clamp(side * 0.24, 28, 80), small = clamp(side * 0.065, 12, 18);
       s += `<div class="col" style="position:absolute;left:0;top:0;width:${cw}px;height:${gh}px;align-items:center;justify-content:center">` +
-        `<div style="color:${P.Text};font-size:${sp(big)};font-weight:700;line-height:1.17">${speed == null ? DASH : speed}</div><div style="color:${P.Muted};font-size:${sp(small)};line-height:1.17">km/h</div></div>`;
+        `<div style="color:${speedColor(speed)};font-size:${sp(big)};font-weight:700;line-height:1.17">${speed == null ? DASH : speed}</div><div style="color:${P.Muted};font-size:${sp(small)};line-height:1.17">km/h</div></div>`;
       if (showCar) {
         const gr = (label, value, color) => `<div class="col" style="flex:1;align-items:center;min-width:0"><div class="nowrap" style="max-width:100%;color:${P.Muted};font-size:${labPx}px;line-height:1.17">${label}</div><div class="nowrap" style="color:${color || P.Text};font-size:${valPx}px;font-weight:500;line-height:1.17">${value}</div></div>`;
         const t1 = CAR.trip1 || null;
@@ -159,7 +172,7 @@ const W_RENDER = {
       const svg = `<svg width="${s}" height="${s}" style="flex:none;transform:rotate(${-b}deg)"><circle cx="${C}" cy="${C}" r="${r}" fill="none" stroke="${tA(0.12)}" stroke-width="3"/>${ticks}<path d="M${C} ${C - r * 0.7} L${C - r * 0.14} ${C} L${C + r * 0.14} ${C}Z" fill="${P.Bad}"/><path d="M${C} ${C + r * 0.7} L${C - r * 0.14} ${C} L${C + r * 0.14} ${C}Z" fill="${tA(0.5)}"/></svg>`;
       const names = ['S', 'SV', 'V', 'JV', 'J', 'JZ', 'Z', 'SZ'];
       const card_ = names[Math.floor((((b % 360) + 360) % 360) / 45 + 0.5) % 8];
-      return `<div class="row" style="width:${cw}px;height:${ch}px">${svg}<div class="col" style="flex:1;margin-left:10px;gap:2px"><div style="font-size:${sp(34)};font-weight:700;color:${P.Text}">${f ? card_ : DASH}</div><div style="color:${P.Muted};font-size:${sp(15)}">${f ? Math.round(b) + '°' : ''}</div>${statRow('Výška', f && f.alt != null ? Math.round(f.alt) + ' m' : DASH)}${statRow('Rychlost', GPS.speed != null ? GPS.speed + ' km/h' : DASH)}</div></div>`;
+      return `<div class="row" style="width:${cw}px;height:${ch}px">${svg}<div class="col" style="flex:1;margin-left:10px;gap:2px"><div style="font-size:${sp(34)};font-weight:700;color:${P.Text}">${f ? card_ : DASH}</div><div style="color:${P.Muted};font-size:${sp(15)}">${f ? Math.round(b) + '°' : ''}</div>${statRow('Výška', f && f.alt != null ? Math.round(f.alt) + ' m' : DASH)}${statRow('Rychlost', GPS.speed != null ? GPS.speed + ' km/h' : DASH, speedColor(GPS.speed))}</div></div>`;
     });
   },
   GPS(c, W, H) {
@@ -393,17 +406,31 @@ const Perf = { phase: 'WAITING', t50: null, t100: null, t400: null, start: 0, di
 };
 
 /* ---------- Povolená rychlost (Overpass) ---------- */
-const SpeedLimit = { value: null, at: 0, lastPos: null,
+const CAR_ROADS = ['trunk', 'trunk_link', 'primary', 'primary_link', 'secondary', 'secondary_link', 'tertiary', 'tertiary_link', 'unclassified', 'residential', 'living_street'];
+function zoneOf(limit, hw) {
+  if (hw === 'motorway' || hw === 'motorway_link') return 'motorway';
+  if (!CAR_ROADS.includes(hw)) return null;
+  if (limit != null) return limit <= 50 ? 'town' : limit >= 130 ? 'motorway' : 'rural';
+  return hw === 'residential' || hw === 'living_street' ? 'town' : 'rural';
+}
+const SpeedLimit = { value: null, zone: null, at: 0, lastPos: null,
   async refresh() {
     const f = GPS.fix;
     if (!f || Date.now() - this.at < 15000) return;
     if (this.lastPos && haversine(this.lastPos.lat, this.lastPos.lon, f.lat, f.lon) < 60) return;
     this.at = Date.now(); this.lastPos = { lat: f.lat, lon: f.lon };
     try {
-      const q = `[out:json][timeout:8];way(around:25,${f.lat},${f.lon})[highway][maxspeed];out tags 1;`;
+      const q = `[out:json][timeout:8];way(around:25,${f.lat},${f.lon})[highway];out tags 5;`;
       const j = await (await fetch('https://overpass-api.de/api/interpreter?data=' + encodeURIComponent(q))).json();
-      const v = j.elements && j.elements[0] && parseInt(j.elements[0].tags.maxspeed, 10);
-      this.value = isNaN(v) ? null : v;
+      let limit = null, zone = null;
+      for (const e of (j.elements || [])) {
+        const t = e.tags || {}, v = parseInt(t.maxspeed, 10), lim = isNaN(v) ? null : v;
+        const z = zoneOf(lim, t.highway);
+        if (lim != null) { limit = lim; zone = z; break; }
+        if (!zone) zone = z;
+      }
+      this.value = limit;
+      if (zone) this.zone = zone;
     } catch (e) { /* bez limitu */ }
   }
 };
