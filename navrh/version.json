@@ -9,7 +9,6 @@
     "Záloha: všechna data v jednom souboru, ručně i automaticky každý den, volitelně na Google Disk",
     "Aplikace: ostré sestavení – mnohem menší APK a rychlejší start",
     "Pády: záznam chyb a tlačítko Odeslat hlášení na GitHub",
-    "Mapy.com: výchozí API klíč z GitHub Secrets, starý klíč se z rádia smaže",
     "Bez internetu: dotazy čekají ve frontě, mapa a čerpací stanice fungují z paměti",
     "Rychlost: barva podle překročení rychlosti v obci, mimo obec a na dálnici"
   ],
